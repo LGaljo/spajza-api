@@ -1,0 +1,53 @@
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Category } from '../../categories/schemas/category.schema';
+import { Tag } from '../../tags/schemas/tag.schema';
+import { ObjectId } from 'mongodb';
+import { toNgrams } from '../../../lib/utils';
+
+export type InventoryItemDocument = InventoryItem & Document;
+
+// db.getCollection('inventoryitems').createIndex({nngrams: "text"})
+
+@Schema()
+export class InventoryItem {
+  @Prop()
+  name: string;
+
+  @Prop()
+  nngrams: string;
+
+  @Prop()
+  owner: string;
+
+  @Prop()
+  location: string;
+
+  @Prop()
+  count: number;
+
+  @Prop({ type: Array, ref: 'Tag', default: [] })
+  tags: Tag[];
+
+  @Prop()
+  description: string;
+
+  @Prop()
+  borrower: string;
+
+  @Prop({ default: false })
+  retired: boolean;
+
+  @Prop()
+  status: string;
+
+  @Prop({ type: ObjectId, ref: 'Category' })
+  category: Category;
+
+  @Prop({ default: new Date() })
+  _createdAt: Date;
+
+  @Prop({ default: new Date() })
+  boughtTime: Date;
+}
+
+export const InventoryItemsSchema = SchemaFactory.createForClass(InventoryItem);

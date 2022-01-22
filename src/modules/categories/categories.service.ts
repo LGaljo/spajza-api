@@ -1,12 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, ObjectId } from 'mongoose';
+import { Model } from 'mongoose';
 import { Category, CategoryDocument } from './schemas/category.schema';
+import { ObjectId } from 'mongodb';
+import { InventoryItem, InventoryItemDocument } from '../songs/schemas/inventoryitem.schema';
 
 @Injectable()
 export class CategoriesService {
   constructor(
     @InjectModel(Category.name) private model: Model<CategoryDocument>,
+    @InjectModel(InventoryItem.name) private modelItem: Model<InventoryItemDocument>,
   ) {}
 
   async create(object: any): Promise<CategoryDocument> {
@@ -20,7 +23,7 @@ export class CategoriesService {
   }
 
   async findOneById(id: ObjectId): Promise<CategoryDocument> {
-    return await this.model.findOne({ _id: id }).exec();
+    return await this.model.findOne({ _id: new ObjectId(id) }).exec();
   }
 
   async findOneByName(name: string): Promise<CategoryDocument> {
@@ -28,15 +31,22 @@ export class CategoriesService {
   }
 
   async updateOne(body: any, id: string): Promise<any> {
-    return await this.model.updateOne({ _id: id }, { $set: body }).exec();
+    return await this.model.updateOne({ _id: new ObjectId(id) }, { $set: body }).exec();
   }
 
   async deleteOne(id: string): Promise<any> {
-    return await this.model.deleteOne({ _id: id }).exec();
+    const countItems = await this.modelItem
+      .find({ category: new ObjectId(id) })
+      .count()
+      .exec();
+    if (countItems > 0) {
+      throw new BadRequestException('There are still objects in this category');
+    }
+    return await this.model.deleteOne({ _id: new ObjectId(id) }).exec();
   }
 
-  async exists(InventoryItemId: string): Promise<boolean> {
-    const obj = await this.model.findOne({ InventoryItemId }).exec();
+  async exists(id: string): Promise<boolean> {
+    const obj = await this.model.findOne({ _id: new ObjectId(id) }).exec();
     return !!obj?._id;
   }
 }

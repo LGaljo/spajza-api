@@ -41,7 +41,9 @@ export class InventoryItemsService {
       object.tags = object.tags.map((t: any) => new ObjectId(t));
     }
 
-    if (object?.categoryName) {
+    if (object?.category) {
+      object.category = new ObjectId(object.category);
+    } else if (object?.categoryName) {
       const doc: any = await this.categoryService.findOneByName(object.categoryName);
       object.category = doc?._id;
     }
@@ -60,10 +62,10 @@ export class InventoryItemsService {
     search: string = null,
   ): Promise<any> {
     const filter = {};
-    let sort: any = { id: -1 };
+    let sort: any = { _id: -1 };
     category ? (filter['category'] = new ObjectId(category)) : null;
     if (tags) {
-      filter['tags'] = tags.map((t: any) => new ObjectId(t));
+      filter['tags'] = { $in: tags.map((t: any) => new ObjectId(t)) };
     }
     if (search) {
       filter['$text'] = { $search: search };
@@ -74,8 +76,8 @@ export class InventoryItemsService {
       .aggregate([
         { $match: filter },
         { $sort: sort },
-        { $limit: limit },
-        { $skip: skip },
+        // { $limit: limit },
+        // { $skip: skip },
         { $unwind: { path: '$tags', preserveNullAndEmptyArrays: true } },
         {
           $lookup: {
@@ -108,6 +110,7 @@ export class InventoryItemsService {
             count: { $first: '$count' },
             location: { $first: '$location' },
             owner: { $first: '$owner' },
+            status: { $first: '$status' },
           },
         },
       ])
@@ -153,6 +156,7 @@ export class InventoryItemsService {
             count: { $first: '$count' },
             location: { $first: '$location' },
             owner: { $first: '$owner' },
+            status: { $first: '$status' },
           },
         },
       ])
@@ -162,6 +166,12 @@ export class InventoryItemsService {
 
   async updateOne(object: any, id: string): Promise<any> {
     object.nngrams = toNgrams(object.name);
+    if (object?.category) {
+      object.category = new ObjectId(object.category);
+    }
+    if (object?.tags) {
+      object.tags = object.tags.map((t: any) => new ObjectId(t));
+    }
     return await this.inventoryItemModel
       .updateOne({ _id: new ObjectId(id) }, { $set: object })
       .exec();

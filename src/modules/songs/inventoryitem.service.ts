@@ -75,7 +75,6 @@ export class InventoryItemsService {
     return await this.inventoryItemModel
       .aggregate([
         { $match: filter },
-        { $sort: sort },
         // { $limit: limit },
         // { $skip: skip },
         { $unwind: { path: '$tags', preserveNullAndEmptyArrays: true } },
@@ -113,6 +112,7 @@ export class InventoryItemsService {
             status: { $first: '$status' },
           },
         },
+        { $sort: sort },
       ])
       .exec();
   }

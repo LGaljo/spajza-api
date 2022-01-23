@@ -2,7 +2,6 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Category } from '../../categories/schemas/category.schema';
 import { Tag } from '../../tags/schemas/tag.schema';
 import { ObjectId } from 'mongodb';
-import { toNgrams } from '../../../lib/utils';
 
 export type InventoryItemDocument = InventoryItem & Document;
 

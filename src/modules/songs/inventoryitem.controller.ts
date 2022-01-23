@@ -13,7 +13,7 @@ export class InventoryItemsController {
     const limit = Number(params?.limit) || 15;
     const skip = Number(params?.skip) || 0;
 
-    return await this.service.findAll(limit, skip, query?.category, query?.tags, query.search);
+    return await this.service.findAll(limit, skip, query?.category, query?.tags, query?.search);
   }
 
   @Get('all')

@@ -15,8 +15,8 @@ async function bootstrap() {
   app.enableCors();
   app.use(helmet());
 
-  await app.listen(env.API_PORT, env.API_HOST);
-  console.log(`API server listening on ${env.API_HOST}:${env.API_PORT}`);
+  await app.listen(env.PORT, env.HOST);
+  console.log(`API server listening on ${env.HOST}:${env.PORT}`);
   return app;
 }
 

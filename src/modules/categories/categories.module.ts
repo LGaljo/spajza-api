@@ -3,7 +3,7 @@ import { CategoriesService } from './categories.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { CategoriesSchema, Category } from './schemas/category.schema';
 import { CategoriesController } from './categories.controller';
-import { InventoryItem, InventoryItemsSchema } from '../songs/schemas/inventoryitem.schema';
+import { InventoryItem, InventoryItemsSchema } from '../inventoryitem/schemas/inventoryitem.schema';
 
 @Module({
   imports: [

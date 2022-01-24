@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Tag, TagDocument } from './schemas/tag.schema';
-import { InventoryItem, InventoryItemDocument } from '../songs/schemas/inventoryitem.schema';
+import { InventoryItem, InventoryItemDocument } from '../inventoryitem/schemas/inventoryitem.schema';
 import { ObjectId } from 'mongodb';
 
 @Injectable()

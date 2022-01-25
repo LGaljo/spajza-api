@@ -30,6 +30,7 @@ export class UserController {
       body.hasOwnProperty('password') &&
       body.hasOwnProperty('username')
     ) {
+      delete body.role;
       return this.userService.create(body);
     }
 

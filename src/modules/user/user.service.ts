@@ -19,15 +19,39 @@ export class UserService {
     return createdUser;
   }
 
-  async findAll(): Promise<User[]> {
-    return await this.userModel.find().exec();
+  async findAll(keepHash = false): Promise<User[]> {
+    const docs = await this.userModel.find().exec();
+
+    if (keepHash) {
+      return docs;
+    }
+
+    return docs.map((doc) => {
+      delete doc.hash;
+      delete doc.salt;
+      return doc;
+    });
   }
 
-  async findOneByUsername(username: string): Promise<UserDocument> {
-    return this.userModel.findOne({ username: username }).exec();
+  async findOneByUsernameOrEmail(value: string, keepHash = false): Promise<UserDocument> {
+    const obj = await this.userModel
+      .findOne({ $or: [{ username: value }, { email: value }] })
+      .exec();
+
+    if (!keepHash) {
+      delete obj.hash;
+      delete obj.salt;
+    }
+    return obj;
   }
 
-  async findOneById(id: string): Promise<UserDocument> {
-    return this.userModel.findOne({ _id: new ObjectId(id) }).exec();
+  async findOneById(id: string, keepHash = false): Promise<UserDocument> {
+    const obj = await this.userModel.findOne({ _id: new ObjectId(id) }).exec();
+
+    if (!keepHash) {
+      delete obj.hash;
+      delete obj.salt;
+    }
+    return obj;
   }
 }

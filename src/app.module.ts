@@ -11,6 +11,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from './modules/user/user.module';
 import { RequestLog, RequestLogSchema } from './modules/request-log/request-log.schema';
 import { RequestLogMiddleware } from './middlewares/request-log.middleware';
+import { JwtModule, JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -21,6 +22,10 @@ import { RequestLogMiddleware } from './middlewares/request-log.middleware';
     InventoryitemModule,
     TagsModule,
     CategoriesModule,
+    JwtModule.register({
+      secret: env.JWT_SECRET,
+      signOptions: { expiresIn: '48h' },
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],

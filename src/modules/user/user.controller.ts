@@ -1,7 +1,9 @@
 import { BadRequestException, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { IRequest } from '../../middlewares/context.middleware';
 import { UserService } from './user.service';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
+import { Roles } from '../../guards/roles.decorator';
+import { Role } from './schemas/roles.enum';
 
 @Controller('user')
 export class UserController {
@@ -9,6 +11,7 @@ export class UserController {
 
   @Get()
   @UseGuards(JwtAuthGuard)
+  @Roles(Role.ADMIN)
   public async getUsers(@Req() _request: IRequest): Promise<any> {
     return this.userService.findAll();
   }

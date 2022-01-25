@@ -1,7 +1,10 @@
 import { Controller, Get, Post, Put, Req, UseGuards } from '@nestjs/common';
 import { IRequest } from '../../middlewares/context.middleware';
 import { InventoryItemsService } from './inventoryitem.service';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
+import { RolesGuard } from '../../guards/roles.guard';
+import { Roles } from '../../guards/roles.decorator';
+import { Role } from '../user/schemas/roles.enum';
 
 @Controller('inventory')
 export class InventoryItemsController {
@@ -9,6 +12,8 @@ export class InventoryItemsController {
 
   @Get()
   @UseGuards(JwtAuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN, Role.USER)
   public async getInventoryItems(@Req() request: IRequest): Promise<any> {
     const { params, query } = request;
 
@@ -18,14 +23,10 @@ export class InventoryItemsController {
     return await this.service.findAll(limit, skip, query?.category, query?.tags, query?.search);
   }
 
-  @Get('all')
-  @UseGuards(JwtAuthGuard)
-  public async updateAll() {
-    return await this.service.updateAll();
-  }
-
   @Get(':id')
   @UseGuards(JwtAuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN, Role.USER)
   public async getInventoryItem(@Req() request: IRequest): Promise<any> {
     const { params } = request;
     return await this.service.findOne(params?.id);
@@ -33,6 +34,8 @@ export class InventoryItemsController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN)
   public async createInventoryItem(@Req() request: IRequest): Promise<any> {
     const { body } = request;
     return await this.service.create(body);
@@ -40,8 +43,12 @@ export class InventoryItemsController {
 
   @Put(':id')
   @UseGuards(JwtAuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN)
   public async updateItem(@Req() request: IRequest): Promise<any> {
     const { body, params } = request;
     return await this.service.updateOne(body, params.id);
   }
+
+  // TODO: Add different update method for modifying only specific fields
 }

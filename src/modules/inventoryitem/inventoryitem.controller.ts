@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Req, UseGuards } from '@nestjs/common';
+import { Controller, Delete, Get, Post, Put, Req, UseGuards } from '@nestjs/common';
 import { IRequest } from '../../middlewares/context.middleware';
 import { InventoryItemsService } from './inventoryitem.service';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
@@ -51,4 +51,13 @@ export class InventoryItemsController {
   }
 
   // TODO: Add different update method for modifying only specific fields
+
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN)
+  public async deleteItem(@Req() request: IRequest): Promise<any> {
+    const { params } = request;
+    return await this.service.deleteItem(params.id);
+  }
 }

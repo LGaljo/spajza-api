@@ -8,6 +8,7 @@ import { ObjectId } from 'mongodb';
 import { toNgrams } from '../../lib/utils';
 import { CategoriesService } from '../categories/categories.service';
 import { TagsService } from '../tags/tags.service';
+import { CountersService } from '../counters/counters.service';
 
 @Injectable()
 export class InventoryItemsService {
@@ -20,14 +21,8 @@ export class InventoryItemsService {
     private tagModel: Model<TagDocument>,
     private categoryService: CategoriesService,
     private tagService: TagsService,
+    private countersService: CountersService,
   ) {}
-
-  async updateAll() {
-    const docs = await this.inventoryItemModel.find({}).exec();
-    for (const doc of docs) {
-      await this.updateOne(doc, doc._id.toString());
-    }
-  }
 
   async create(object: any): Promise<InventoryItemDocument> {
     if (object?.tagNames) {
@@ -49,6 +44,7 @@ export class InventoryItemsService {
     }
 
     object.nngrams = toNgrams(object.name);
+    object.code = await this.countersService.getLatestCode('items');
     const createdInventoryItem = new this.inventoryItemModel(object);
     await createdInventoryItem.save();
     return createdInventoryItem;
@@ -100,6 +96,7 @@ export class InventoryItemsService {
           $group: {
             _id: '$_id',
             name: { $first: '$name' },
+            code: { $first: '$code' },
             tags: { $addToSet: '$tagsgroup' },
             category: { $addToSet: '$categoryobj' },
             boughtTime: { $first: '$boughtTime' },
@@ -146,6 +143,7 @@ export class InventoryItemsService {
           $group: {
             _id: '$_id',
             name: { $first: '$name' },
+            code: { $first: '$code' },
             tags: { $addToSet: '$tagsgroup' },
             category: { $first: '$categoryobj' },
             categoryId: { $first: '$category' },
@@ -177,8 +175,12 @@ export class InventoryItemsService {
       .exec();
   }
 
-  async exists(InventoryItemId: string): Promise<boolean> {
-    const obj = await this.inventoryItemModel.findOne({ InventoryItemId }).exec();
+  async exists(_id: string): Promise<boolean> {
+    const obj = await this.inventoryItemModel.findOne({ _id }).exec();
     return !!obj?._id;
+  }
+
+  async deleteItem(_id: string) {
+    await this.inventoryItemModel.deleteOne({ _id }).exec();
   }
 }

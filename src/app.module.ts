@@ -12,6 +12,7 @@ import { UserModule } from './modules/user/user.module';
 import { RequestLog, RequestLogSchema } from './modules/request-log/request-log.schema';
 import { RequestLogMiddleware } from './middlewares/request-log.middleware';
 import { JwtModule, JwtService } from '@nestjs/jwt';
+import { CountersModule } from './modules/counters/counters.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { JwtModule, JwtService } from '@nestjs/jwt';
       secret: env.JWT_SECRET,
       signOptions: { expiresIn: '48h' },
     }),
+    CountersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

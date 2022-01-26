@@ -16,6 +16,9 @@ export class InventoryItem {
   nngrams: string;
 
   @Prop()
+  code: number;
+
+  @Prop()
   owner: string;
 
   @Prop()

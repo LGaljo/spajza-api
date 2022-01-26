@@ -30,3 +30,4 @@ export function toNgrams(value: string) {
     .map((t) => t.toLowerCase())
     .join(' ');
 }
+

@@ -13,7 +13,7 @@ export class InventoryItemsController {
   @Get()
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
-  @Roles(Role.ADMIN, Role.USER)
+  @Roles(Role.ADMIN, Role.USER, Role.KEEPER)
   public async getInventoryItems(@Req() request: IRequest): Promise<any> {
     const { params, query } = request;
 
@@ -26,7 +26,7 @@ export class InventoryItemsController {
   @Get(':id')
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
-  @Roles(Role.ADMIN, Role.USER)
+  @Roles(Role.ADMIN, Role.USER, Role.KEEPER)
   public async getInventoryItem(@Req() request: IRequest): Promise<any> {
     const { params } = request;
     return await this.service.findOne(params?.id);
@@ -35,7 +35,7 @@ export class InventoryItemsController {
   @Post()
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
-  @Roles(Role.ADMIN)
+  @Roles(Role.ADMIN, Role.KEEPER)
   public async createInventoryItem(@Req() request: IRequest): Promise<any> {
     const { body } = request;
     return await this.service.create(body);
@@ -44,7 +44,7 @@ export class InventoryItemsController {
   @Put(':id')
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
-  @Roles(Role.ADMIN)
+  @Roles(Role.ADMIN, Role.KEEPER)
   public async updateItem(@Req() request: IRequest): Promise<any> {
     const { body, params } = request;
     return await this.service.updateOne(body, params.id);
@@ -55,7 +55,7 @@ export class InventoryItemsController {
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
-  @Roles(Role.ADMIN)
+  @Roles(Role.ADMIN, Role.KEEPER)
   public async deleteItem(@Req() request: IRequest): Promise<any> {
     const { params } = request;
     return await this.service.deleteItem(params.id);

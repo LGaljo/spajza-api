@@ -1,11 +1,12 @@
 import { env } from '../../config/env';
 
 import * as bcrypt from 'bcrypt';
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { User, UserDocument } from './schemas/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { ObjectId } from 'mongodb';
+import { Role } from './schemas/roles.enum';
 
 @Injectable()
 export class UserService {
@@ -53,5 +54,21 @@ export class UserService {
       delete obj.salt;
     }
     return obj;
+  }
+
+  async update(id: number, data: any) {
+    return await this.userModel.updateOne({ _id: new ObjectId(id) }, { $set: data }).exec();
+  }
+
+  async updateRole(id: string, role: string) {
+    const r = Role[role];
+    if (r) {
+      const user = await this.userModel.findOne({ _id: new ObjectId(id) }).exec();
+      user.role = r;
+      await this.userModel.updateOne({ _id: new ObjectId(id) }, { $set: user }).exec();
+
+      return user;
+    }
+    throw new BadRequestException('Invalid role');
   }
 }

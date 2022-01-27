@@ -1,22 +1,22 @@
-import { BadRequestException, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { BadRequestException, Controller, Get, Post, Put, Req, UseGuards } from '@nestjs/common';
 import { IRequest } from '../../middlewares/context.middleware';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 import { Roles } from '../../guards/roles.decorator';
 import { Role } from './schemas/roles.enum';
+import { RolesGuard } from '../../guards/roles.guard';
 
-@Controller('user')
+@Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
   @UseGuards(JwtAuthGuard)
-  @Roles(Role.ADMIN)
   public async getUsers(@Req() _request: IRequest): Promise<any> {
     return this.userService.findAll();
   }
 
-  @Get(':id')
+  @Get('/:id')
   @UseGuards(JwtAuthGuard)
   public async getUser(@Req() request: IRequest): Promise<any> {
     const { params } = request;
@@ -38,5 +38,25 @@ export class UserController {
     }
 
     throw new BadRequestException('Missing user fields');
+  }
+
+  @Put('/:id')
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN)
+  public async updateUser(@Req() request: IRequest): Promise<any> {
+    const { body, params } = request;
+
+    return this.userService.update(Number(params.id), body);
+  }
+
+  @Put('/:id/role')
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN)
+  public async updateUserRole(@Req() request: IRequest): Promise<any> {
+    const { body, params } = request;
+
+    return this.userService.updateRole(params.id, body?.role);
   }
 }

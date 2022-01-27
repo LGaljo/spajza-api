@@ -13,7 +13,7 @@ export class TagsController {
   @Get()
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
-  @Roles(Role.ADMIN, Role.USER)
+  @Roles(Role.ADMIN, Role.USER, Role.KEEPER)
   public async getAll(@Req() request: IRequest): Promise<any> {
     return await this.service.findAll();
   }

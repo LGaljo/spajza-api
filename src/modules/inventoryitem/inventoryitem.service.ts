@@ -9,8 +9,8 @@ import { toNgrams } from '../../lib/utils';
 import { CategoriesService } from '../categories/categories.service';
 import { TagsService } from '../tags/tags.service';
 import { CountersService } from '../counters/counters.service';
-import { Trace, TraceDocument } from '../tracing/schema/tracing.schema';
 import { TracingService } from '../tracing/tracing.service';
+import { Trace, TraceDocument } from '../tracing/schema/tracing.schema';
 
 @Injectable()
 export class InventoryItemsService {
@@ -52,7 +52,7 @@ export class InventoryItemsService {
     object.code = await this.countersService.getLatestCode('items');
     const createdInventoryItem = new this.inventoryItemModel(object);
     await createdInventoryItem.save();
-    await this.tracingService.saveChange('inventoryitem', 'create', null, object);
+    // await this.tracingService.saveChange('inventoryitem', 'create', null, object);
     return createdInventoryItem;
   }
 
@@ -171,13 +171,14 @@ export class InventoryItemsService {
     const objBefore = await this.inventoryItemModel.findOne({ _id: new ObjectId(id) }).exec();
 
     object.nngrams = toNgrams(object.name);
-    if (object?.category) {
-      object.category = new ObjectId(object.category);
+    if (object?.categoryId) {
+      object.category = new ObjectId(object.categoryId);
     }
     if (object?.tags) {
       object.tags = object.tags.map((t: any) => new ObjectId(t));
     }
 
+    delete object.categoryId;
     await this.tracingService.saveChange('inventoryitem', 'update', objBefore, object);
 
     return await this.inventoryItemModel
@@ -192,7 +193,7 @@ export class InventoryItemsService {
 
   async deleteItem(_id: string) {
     const objBefore = await this.inventoryItemModel.findOne({ _id: new ObjectId(_id) }).exec();
-    await this.tracingService.saveChange('inventoryitem', 'remove', objBefore, null);
+    // await this.tracingService.saveChange('inventoryitem', 'remove', objBefore, null);
     await this.inventoryItemModel.deleteOne({ _id }).exec();
   }
 }

@@ -11,11 +11,11 @@ export class Trace {
   @Prop()
   action: string;
 
-  @Prop()
-  objectId: ObjectId;
+  @Prop({ type: ObjectId })
+  originalObjectId: ObjectId;
 
   @Prop()
-  changes: any[];
+  changes: Array<any>;
 
   @Prop({ default: new Date() })
   _createdAt: Date;

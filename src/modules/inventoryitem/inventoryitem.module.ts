@@ -8,6 +8,8 @@ import { CategoriesSchema, Category } from '../categories/schemas/category.schem
 import { TagsModule } from '../tags/tags.module';
 import { CategoriesModule } from '../categories/categories.module';
 import { CountersModule } from '../counters/counters.module';
+import { Trace, TracesSchema } from '../tracing/schema/tracing.schema';
+import { TracingModule } from '../tracing/tracing.module';
 
 @Module({
   imports: [
@@ -15,10 +17,12 @@ import { CountersModule } from '../counters/counters.module';
       { name: Category.name, schema: CategoriesSchema },
       { name: InventoryItem.name, schema: InventoryItemsSchema },
       { name: Tag.name, schema: TagsSchema },
+      { name: Trace.name, schema: TracesSchema },
     ]),
     TagsModule,
     CategoriesModule,
     CountersModule,
+    TracingModule,
   ],
   providers: [InventoryItemsService],
   controllers: [InventoryItemsController],

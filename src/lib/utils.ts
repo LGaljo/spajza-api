@@ -2,6 +2,7 @@ import { env } from '../config/env';
 import chalk from 'chalk';
 import fs from 'fs';
 import { ngram, tokenize } from 'ngramable';
+import * as _ from 'lodash';
 
 export function getCurrentDateNow() {
   return new Date().toISOString();
@@ -31,3 +32,32 @@ export function toNgrams(value: string) {
     .join(' ');
 }
 
+export function getObjectDiff(before: any, now: any) {
+  const changes = [];
+  const keys = _.union(Object.keys(before), Object.keys(now));
+  for (const key of keys) {
+    if (!before[key] && now[key]) {
+      changes.push({
+        key,
+        valueBefore: before[key],
+        valueNow: now[key],
+        type: 'added',
+      });
+    } else if (before[key] && !now[key]) {
+      changes.push({
+        key,
+        valueBefore: before[key],
+        valueNow: now[key],
+        type: 'removed',
+      });
+    } else if (before[key] !== now[key]) {
+      changes.push({
+        key,
+        valueBefore: before[key],
+        valueNow: now[key],
+        type: 'changed',
+      });
+    }
+  }
+  return changes;
+}

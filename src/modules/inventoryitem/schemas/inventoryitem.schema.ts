@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Category } from '../../categories/schemas/category.schema';
 import { Tag } from '../../tags/schemas/tag.schema';
 import { ObjectId } from 'mongodb';
+import { ItemStatus } from './itemstatus.enum';
 
 export type InventoryItemDocument = InventoryItem & Document;
 
@@ -39,7 +40,7 @@ export class InventoryItem {
   @Prop({ default: false })
   retired: boolean;
 
-  @Prop()
+  @Prop({ default: ItemStatus.NEW })
   status: string;
 
   @Prop({ type: ObjectId, ref: 'Category' })

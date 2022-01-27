@@ -13,6 +13,7 @@ import { RequestLog, RequestLogSchema } from './modules/request-log/request-log.
 import { RequestLogMiddleware } from './middlewares/request-log.middleware';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { CountersModule } from './modules/counters/counters.module';
+import { TracingModule } from './modules/tracing/tracing.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { CountersModule } from './modules/counters/counters.module';
       signOptions: { expiresIn: '48h' },
     }),
     CountersModule,
+    TracingModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -34,6 +34,7 @@
     "bcryptjs": "^2.4.3",
     "dotenv": "^10.0.0",
     "helmet": "^4.6.0",
+    "lodash": "^4.17.21",
     "mongoose": "^6.1.2",
     "ngramable": "^0.2.1",
     "passport": "^0.4.1",

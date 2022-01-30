@@ -34,9 +34,6 @@ export class InventoryItem {
   @Prop()
   description: string;
 
-  @Prop()
-  borrower: string;
-
   @Prop({ default: false })
   retired: boolean;
 

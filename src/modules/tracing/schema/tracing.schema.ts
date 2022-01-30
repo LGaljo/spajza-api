@@ -8,14 +8,14 @@ export class Trace {
   @Prop()
   type: string;
 
-  @Prop()
-  action: string;
-
   @Prop({ type: ObjectId })
   originalObjectId: ObjectId;
 
   @Prop()
   changes: Array<any>;
+
+  @Prop()
+  user: ObjectId;
 
   @Prop({ default: new Date() })
   _createdAt: Date;

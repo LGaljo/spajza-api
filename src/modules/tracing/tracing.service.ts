@@ -9,19 +9,43 @@ import { getObjectDiff } from '../../lib/utils';
 export class TracingService {
   constructor(@InjectModel(Trace.name) private modelTrace: Model<TraceDocument>) {}
 
-  async saveChange(type: string, action: string, beforeObj: any, nowObj: any) {
+  async saveChange(type: string, beforeObj: any, nowObj: any, userId: number) {
     const changes = getObjectDiff(beforeObj, nowObj);
 
     const trace = new this.modelTrace({
       type,
       changes,
       originalObjectId: new ObjectId(nowObj._id),
-      action,
+      user: new ObjectId(userId),
     });
     await trace.save();
   }
 
   async getChangesForObject(id: string) {
-    return await this.modelTrace.find({ originalObjectId: new ObjectId(id) }).exec();
+    return await this.modelTrace
+      .aggregate([
+        { $match: { originalObjectId: new ObjectId(id) } },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'user',
+            foreignField: '_id',
+            as: 'userObj',
+          },
+        },
+        { $unwind: { path: '$userObj', preserveNullAndEmptyArrays: true } },
+        {
+          $group: {
+            _id: '$_id',
+            changes: { $first: '$changes' },
+            originalObjectId: { $first: '$originalObjectId' },
+            type: { $first: '$type' },
+            user: { $first: '$userObj' },
+            userId: { $first: '$user' },
+            _createdAt: { $first: '$_createdAt' },
+          },
+        },
+      ])
+      .exec();
   }
 }

@@ -46,8 +46,8 @@ export class InventoryItemsController {
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN, Role.KEEPER)
   public async updateItem(@Req() request: IRequest): Promise<any> {
-    const { body, params } = request;
-    return await this.service.updateOne(body, params.id);
+    const { body, params, context } = request;
+    return await this.service.updateOne(context, body, params.id);
   }
 
   // TODO: Add different update method for modifying only specific fields

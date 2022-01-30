@@ -11,6 +11,9 @@ import { TagsService } from '../tags/tags.service';
 import { CountersService } from '../counters/counters.service';
 import { TracingService } from '../tracing/tracing.service';
 import { Trace, TraceDocument } from '../tracing/schema/tracing.schema';
+import { Context } from '../../context';
+import { User, UserSchema } from '../user/schemas/user.schema';
+import { ChangeType } from '../tracing/schema/change.enum';
 
 @Injectable()
 export class InventoryItemsService {
@@ -167,7 +170,7 @@ export class InventoryItemsService {
       .then((doc: any[]) => doc[0]);
   }
 
-  async updateOne(object: any, id: string): Promise<any> {
+  async updateOne(context: Context, object: any, id: string): Promise<any> {
     const objBefore = await this.inventoryItemModel.findOne({ _id: new ObjectId(id) }).exec();
 
     object.nngrams = toNgrams(object.name);
@@ -179,7 +182,7 @@ export class InventoryItemsService {
     }
 
     delete object.categoryId;
-    await this.tracingService.saveChange('inventoryitem', 'update', objBefore, object);
+    await this.tracingService.saveChange('inventoryitem', objBefore, object, context?.user._id);
 
     return await this.inventoryItemModel
       .updateOne({ _id: new ObjectId(id) }, { $set: object })

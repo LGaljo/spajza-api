@@ -4,6 +4,7 @@ import fs from 'fs';
 import { ngram, tokenize } from 'ngramable';
 import * as _ from 'lodash';
 import { ObjectId } from 'mongodb';
+import { ChangeType } from '../modules/tracing/schema/change.enum';
 
 export function getCurrentDateNow() {
   return new Date().toISOString();
@@ -50,14 +51,14 @@ export function getObjectDiff(before: any, now: any) {
         key,
         valueBefore: before[key],
         valueNow: now[key],
-        type: 'added',
+        type: ChangeType.ADDED,
       });
     } else if (before[key] && !now[key]) {
       changes.push({
         key,
         valueBefore: before[key],
         valueNow: now[key],
-        type: 'removed',
+        type: ChangeType.REMOVED,
       });
     } else if (before[key] !== now[key]) {
       if (deepCompare(before[key], now[key])) {
@@ -65,7 +66,7 @@ export function getObjectDiff(before: any, now: any) {
           key,
           valueBefore: before[key],
           valueNow: now[key],
-          type: 'changed',
+          type: ChangeType.CHANGED,
         });
       }
     }

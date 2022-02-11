@@ -1,10 +1,11 @@
-import { Controller, Delete, Get, Post, Put, Req, UseGuards } from '@nestjs/common';
+import { Controller, Delete, Get, Post, Put, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { IRequest } from '../../middlewares/context.middleware';
 import { InventoryItemsService } from './inventoryitem.service';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 import { RolesGuard } from '../../guards/roles.guard';
 import { Roles } from '../../guards/roles.decorator';
 import { Role } from '../user/schemas/roles.enum';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('inventory')
 export class InventoryItemsController {
@@ -20,7 +21,7 @@ export class InventoryItemsController {
     const limit = Number(params?.limit) || 15;
     const skip = Number(params?.skip) || 0;
 
-    return await this.service.findAll(limit, skip, query);
+    return this.service.findAll(limit, skip, query);
   }
 
   @Get(':id')
@@ -29,7 +30,7 @@ export class InventoryItemsController {
   @Roles(Role.ADMIN, Role.USER, Role.KEEPER)
   public async getInventoryItem(@Req() request: IRequest): Promise<any> {
     const { params } = request;
-    return await this.service.findOne(params?.id);
+    return this.service.findOne(params?.id);
   }
 
   @Post()
@@ -38,7 +39,14 @@ export class InventoryItemsController {
   @Roles(Role.ADMIN, Role.KEEPER)
   public async createInventoryItem(@Req() request: IRequest): Promise<any> {
     const { body } = request;
-    return await this.service.create(body);
+    return this.service.create(body);
+  }
+
+  @Post('file/:id')
+  @UseInterceptors(FileInterceptor('file'))
+  public async updatePicture(@UploadedFile() file: Express.Multer.File, @Req() request: IRequest) {
+    const { params } = request;
+    return this.service.updateCoverImage(file, params.id);
   }
 
   @Put(':id')
@@ -47,7 +55,7 @@ export class InventoryItemsController {
   @Roles(Role.ADMIN, Role.KEEPER)
   public async updateItem(@Req() request: IRequest): Promise<any> {
     const { body, params, context } = request;
-    return await this.service.updateOne(context, body, params.id);
+    return this.service.updateOne(context, body, params.id);
   }
 
   // TODO: Add different update method for modifying only specific fields
@@ -58,6 +66,6 @@ export class InventoryItemsController {
   @Roles(Role.ADMIN, Role.KEEPER)
   public async deleteItem(@Req() request: IRequest): Promise<any> {
     const { params } = request;
-    return await this.service.deleteItem(params.id);
+    return this.service.deleteItem(params.id);
   }
 }

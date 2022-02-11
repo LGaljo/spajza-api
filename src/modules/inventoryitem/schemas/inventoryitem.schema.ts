@@ -40,6 +40,9 @@ export class InventoryItem {
   @Prop({ default: ItemStatus.NEW })
   status: string;
 
+  @Prop({ type: Object })
+  cover: any;
+
   @Prop({ type: ObjectId, ref: 'Category' })
   category: Category;
 

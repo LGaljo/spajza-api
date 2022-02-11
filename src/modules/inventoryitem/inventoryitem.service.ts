@@ -12,8 +12,7 @@ import { CountersService } from '../counters/counters.service';
 import { TracingService } from '../tracing/tracing.service';
 import { Trace, TraceDocument } from '../tracing/schema/tracing.schema';
 import { Context } from '../../context';
-import { User, UserSchema } from '../user/schemas/user.schema';
-import { ChangeType } from '../tracing/schema/change.enum';
+import * as s3 from '../../lib/aws_s3';
 
 @Injectable()
 export class InventoryItemsService {
@@ -75,7 +74,7 @@ export class InventoryItemsService {
       sort = { score: { $meta: 'textScore' } };
     }
 
-    return await this.inventoryItemModel
+    return this.inventoryItemModel
       .aggregate([
         { $match: filter },
         // { $limit: limit },
@@ -104,6 +103,7 @@ export class InventoryItemsService {
             _id: '$_id',
             name: { $first: '$name' },
             code: { $first: '$code' },
+            cover: { $first: '$cover' },
             tags: { $addToSet: '$tagsgroup' },
             category: { $first: '$categoryobj' },
             categoryId: { $first: '$category' },
@@ -152,6 +152,7 @@ export class InventoryItemsService {
             _id: '$_id',
             name: { $first: '$name' },
             code: { $first: '$code' },
+            cover: { $first: '$cover' },
             tags: { $addToSet: '$tagsgroup' },
             category: { $first: '$categoryobj' },
             categoryId: { $first: '$category' },
@@ -180,12 +181,23 @@ export class InventoryItemsService {
     if (object?.tags) {
       object.tags = object.tags.map((t: any) => new ObjectId(t));
     }
-
+    if (!object?.cover && objBefore?.cover?.Key) {
+      await s3.remove(objBefore?.cover?.Key);
+    }
     delete object.categoryId;
     await this.tracingService.saveChange('inventoryitem', objBefore, object, context?.user._id);
 
-    return await this.inventoryItemModel
+    return this.inventoryItemModel
       .updateOne({ _id: new ObjectId(id) }, { $set: object })
+      .exec();
+  }
+
+  async updateCoverImage(file: any, id: string): Promise<any> {
+    const key = `item/${id}/original_${new ObjectId().toHexString()}.${file.mimetype.split('/')[1]}`;
+    const response = await s3.upload(key, file.mimetype, file.buffer);
+
+    this.inventoryItemModel
+      .updateOne({ _id: new ObjectId(id) }, { $set: { cover: response } })
       .exec();
   }
 

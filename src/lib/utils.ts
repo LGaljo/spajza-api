@@ -40,8 +40,8 @@ export function getObjectDiff(before: any, now: any) {
     // Object.keys(before._doc),
     Object.keys(now),
   );
-  console.log(before._doc, Object.keys(before._doc));
-  console.log(now, Object.keys(now));
+  // console.log(before._doc, Object.keys(before._doc));
+  // console.log(now, Object.keys(now));
   // console.log(keys);
   for (const key of keys) {
     if (['_id', '__v', 'nngrams'].includes(key)) {

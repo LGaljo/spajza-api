@@ -7,6 +7,10 @@ export interface Env {
   ON_LINUX: boolean;
   JWT_SECRET: string;
   SALT_ROUNDS: number;
+  AWS_KEY: string;
+  AWS_SECRET: string;
+  AWS_REG: string;
+  AWS_BUCKET: string;
 }
 
 dotenv.config();
@@ -18,4 +22,8 @@ export const env: Env = {
   MONGO_URI: process.env['MONGO_URI'],
   JWT_SECRET: process.env['JWT_SECRET'],
   SALT_ROUNDS: Number(process.env['SALT_ROUNDS']),
+  AWS_KEY: process.env['AWS_KEY'],
+  AWS_SECRET: process.env['AWS_SECRET'],
+  AWS_REG: process.env['AWS_REG'],
+  AWS_BUCKET: process.env['AWS_BUCKET'],
 };

@@ -1,0 +1,12 @@
+{
+  "cSpell.words": [
+    "DATEDIFF",
+    "UNPROCESSABLE",
+    "nestjs",
+    "sonarjs"
+  ],
+  "[typescript]": { 
+    "editor.formatOnSave": true,
+    "editor.formatOnPaste": true
+  }
+}

@@ -22,7 +22,7 @@ export class TracingService {
   }
 
   async getChangesForObject(id: string) {
-    return await this.modelTrace
+    return this.modelTrace
       .aggregate([
         { $match: { originalObjectId: new ObjectId(id) } },
         {

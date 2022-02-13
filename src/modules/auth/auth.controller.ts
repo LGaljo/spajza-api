@@ -11,7 +11,8 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @Post('login')
   async login(@Req() req: IRequest) {
-    return this.authService.login(req.user);
+    const { user, body } = req;
+    return this.authService.login(user, body?.saveme);
   }
 
   @UseGuards(JwtAuthGuard)

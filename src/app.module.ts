@@ -14,6 +14,7 @@ import { RequestLogMiddleware } from './middlewares/request-log.middleware';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { CountersModule } from './modules/counters/counters.module';
 import { TracingModule } from './modules/tracing/tracing.module';
+import { RentsModule } from './modules/rents/rents.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { TracingModule } from './modules/tracing/tracing.module';
     }),
     CountersModule,
     TracingModule,
+    RentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

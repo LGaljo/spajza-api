@@ -16,10 +16,10 @@ export class InventoryItemsController {
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN, Role.USER, Role.KEEPER)
   public async getInventoryItems(@Req() request: IRequest): Promise<any> {
-    const { params, query } = request;
+    const { query } = request;
 
-    const limit = Number(params?.limit) || 15;
-    const skip = Number(params?.skip) || 0;
+    const limit = Number(query?.limit) || 15;
+    const skip = Number(query?.skip) || 0;
 
     return this.service.findAll(limit, skip, query);
   }

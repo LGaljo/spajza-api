@@ -96,8 +96,17 @@ export class InventoryItemsService {
             as: 'tagsgroup',
           },
         },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'rents.renter',
+            foreignField: '_id',
+            as: 'userobj',
+          },
+        },
         { $unwind: { path: '$tagsgroup', preserveNullAndEmptyArrays: true } },
         { $unwind: { path: '$categoryobj', preserveNullAndEmptyArrays: true } },
+        { $unwind: { path: '$userobj', preserveNullAndEmptyArrays: true } },
         {
           $group: {
             _id: '$_id',
@@ -113,6 +122,8 @@ export class InventoryItemsService {
             description: { $first: '$description' },
             count: { $first: '$count' },
             location: { $first: '$location' },
+            rents: { $first: '$rents' },
+            renter: { $first: '$userobj' },
             owner: { $first: '$owner' },
             status: { $first: '$status' },
           },
@@ -145,8 +156,17 @@ export class InventoryItemsService {
             as: 'tagsgroup',
           },
         },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'rents.renter',
+            foreignField: '_id',
+            as: 'userobj',
+          },
+        },
         { $unwind: { path: '$tagsgroup', preserveNullAndEmptyArrays: true } },
         { $unwind: { path: '$categoryobj', preserveNullAndEmptyArrays: true } },
+        { $unwind: { path: '$userobj', preserveNullAndEmptyArrays: true } },
         {
           $group: {
             _id: '$_id',
@@ -162,6 +182,8 @@ export class InventoryItemsService {
             description: { $first: '$description' },
             count: { $first: '$count' },
             location: { $first: '$location' },
+            rents: { $first: '$rents' },
+            renter: { $first: '$userobj' },
             owner: { $first: '$owner' },
             status: { $first: '$status' },
           },

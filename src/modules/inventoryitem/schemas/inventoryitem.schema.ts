@@ -43,6 +43,9 @@ export class InventoryItem {
   @Prop({ type: Object })
   cover: any;
 
+  @Prop({ type: Object })
+  rents: any;
+
   @Prop({ type: ObjectId, ref: 'Category' })
   category: Category;
 

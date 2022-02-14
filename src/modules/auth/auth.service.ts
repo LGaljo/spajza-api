@@ -15,7 +15,7 @@ export class AuthService {
     return null;
   }
 
-  async login(user: any) {
+  async login(user: any, saveme: boolean) {
     const payload = {
       username: user.username,
       userId: user?._id?.toHexString(),
@@ -23,7 +23,9 @@ export class AuthService {
       role: user?.role,
     };
     return {
-      access_token: this.jwtService.sign(payload),
+      access_token: this.jwtService.sign(payload, {
+        expiresIn: saveme ? '7d' : '2d'
+      }),
       username: user?.username,
       userId: user?._id?.toHexString(),
     };

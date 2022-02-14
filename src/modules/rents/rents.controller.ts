@@ -10,12 +10,21 @@ import { RentsService } from './rents.service';
 export class RentsController {
     constructor(private readonly service: RentsService) { }
 
-    @Post(':id')
+    @Post('borrow/:id')
     @UseGuards(JwtAuthGuard)
     @UseGuards(RolesGuard)
     @Roles(Role.ADMIN, Role.KEEPER, Role.USER)
     public async createInventoryItem(@Req() request: IRequest): Promise<any> {
-        const { body, params } = request;
-        return this.service.rentItem(params.id, body);
+        const { context, body, params } = request;
+        return this.service.rentItem(context, params.id, body);
+    }
+
+    @Post('return/:id')
+    @UseGuards(JwtAuthGuard)
+    @UseGuards(RolesGuard)
+    @Roles(Role.ADMIN, Role.KEEPER, Role.USER)
+    public async returnInventoryItem(@Req() request: IRequest): Promise<any> {
+        const { context, params } = request;
+        return this.service.returnItem(context, params.id);
     }
 }

@@ -15,6 +15,7 @@ import { JwtModule, JwtService } from '@nestjs/jwt';
 import { CountersModule } from './modules/counters/counters.module';
 import { TracingModule } from './modules/tracing/tracing.module';
 import { RentsModule } from './modules/rents/rents.module';
+import { WishlistModule } from './modules/wishlist/wishlist.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { RentsModule } from './modules/rents/rents.module';
     CountersModule,
     TracingModule,
     RentsModule,
+    WishlistModule,
   ],
   controllers: [AppController],
   providers: [AppService],

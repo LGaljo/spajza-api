@@ -1,4 +1,4 @@
-import { Controller, Delete, Get, Post, Put, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Controller, Delete, Get, Post, Put, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { IRequest } from '../../middlewares/context.middleware';
 import { InventoryItemsService } from './inventoryitem.service';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
@@ -40,6 +40,20 @@ export class InventoryItemsController {
   public async createInventoryItem(@Req() request: IRequest): Promise<any> {
     const { body } = request;
     return this.service.create(body);
+  }
+
+  @Post('multi')
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN, Role.KEEPER)
+  public async createMultipleInventoryItems(@Req() request: IRequest): Promise<any> {
+    const { body } = request;
+    if (!body.length) {
+      throw new BadRequestException('Empty body');
+    }
+    for (const item of body) {
+      this.service.create(item)
+    }
   }
 
   @Post('file/:id')

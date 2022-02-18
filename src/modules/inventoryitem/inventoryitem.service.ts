@@ -13,6 +13,7 @@ import { TracingService } from '../tracing/tracing.service';
 import { Trace, TraceDocument } from '../tracing/schema/tracing.schema';
 import { Context } from '../../context';
 import * as s3 from '../../lib/aws_s3';
+import * as Jimp from 'jimp';
 
 @Injectable()
 export class InventoryItemsService {
@@ -216,11 +217,16 @@ export class InventoryItemsService {
 
   async updateCoverImage(file: any, id: string): Promise<any> {
     const key = `item/${id}/original_${new ObjectId().toHexString()}.${file.mimetype.split('/')[1]}`;
-    const response = await s3.upload(key, file.mimetype, file.buffer);
-
-    this.inventoryItemModel
-      .updateOne({ _id: new ObjectId(id) }, { $set: { cover: response } })
-      .exec();
+    const image = await Jimp.read(file.buffer);
+    image.resize(800, Jimp.AUTO, Jimp.RESIZE_NEAREST_NEIGHBOR).quality(50);
+    // image.re
+    image.getBuffer(file.mimetype, async (err, img) => {
+      if (err) throw err;
+      const response = await s3.upload(key, file.mimetype, img);
+      this.inventoryItemModel
+        .updateOne({ _id: new ObjectId(id) }, { $set: { cover: response } })
+        .exec();
+    })
   }
 
   async exists(_id: string): Promise<boolean> {

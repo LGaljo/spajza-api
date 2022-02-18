@@ -200,7 +200,7 @@ export class InventoryItemsService {
     if (object?.categoryId) {
       object.category = new ObjectId(object.categoryId);
     }
-    if (object?.tags) {
+    if (object?.tags && object.tags.length && !(object.tags[0] instanceof Object)) {
       object.tags = object.tags.map((t: any) => new ObjectId(t));
     }
     if (!object?.cover && objBefore?.cover?.Key) {

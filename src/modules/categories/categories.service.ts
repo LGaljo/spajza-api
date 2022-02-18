@@ -19,19 +19,19 @@ export class CategoriesService {
   }
 
   async findAll(): Promise<CategoryDocument[]> {
-    return await this.model.find().sort({ name: 1 }).exec();
+    return this.model.find().sort({ name: 1 }).exec();
   }
 
   async findOneById(id: ObjectId): Promise<CategoryDocument> {
-    return await this.model.findOne({ _id: new ObjectId(id) }).exec();
+    return this.model.findOne({ _id: new ObjectId(id) }).exec();
   }
 
   async findOneByName(name: string): Promise<CategoryDocument> {
-    return await this.model.findOne({ name }).exec();
+    return this.model.findOne({ name }).exec();
   }
 
   async updateOne(body: any, id: string): Promise<any> {
-    return await this.model.updateOne({ _id: new ObjectId(id) }, { $set: body }).exec();
+    return this.model.updateOne({ _id: new ObjectId(id) }, { $set: body }).exec();
   }
 
   async deleteOne(id: string): Promise<any> {
@@ -42,7 +42,7 @@ export class CategoriesService {
     if (countItems > 0) {
       throw new BadRequestException('There are still objects in this category');
     }
-    return await this.model.deleteOne({ _id: new ObjectId(id) }).exec();
+    return this.model.deleteOne({ _id: new ObjectId(id) }).exec();
   }
 
   async exists(id: string): Promise<boolean> {

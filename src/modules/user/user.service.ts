@@ -7,6 +7,10 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { ObjectId } from 'mongodb';
 import { Role } from './schemas/roles.enum';
+import { AuthService } from '../auth/auth.service';
+import { generateActivationUrl } from '../../lib/jwt';
+import { MailTemplates } from '../../lib/mail-templates';
+import { sendMail } from '../../lib/smtp';
 
 @Injectable()
 export class UserService {
@@ -17,6 +21,11 @@ export class UserService {
     createdUser.hash = await bcrypt.hash(createDto.password, env.SALT_ROUNDS);
     createdUser.salt = env.SALT_ROUNDS;
     await createdUser.save();
+
+    await this.resendVerification(createdUser.id);
+
+    delete createdUser.hash;
+    delete createdUser.salt;
     return createdUser;
   }
 
@@ -49,14 +58,14 @@ export class UserService {
   async findOneById(id: string, keepHash = false): Promise<UserDocument> {
     const obj = await this.userModel.findOne({ _id: new ObjectId(id) }).exec();
 
-    if (!keepHash) {
+    if (obj && !keepHash) {
       delete obj.hash;
       delete obj.salt;
     }
     return obj;
   }
 
-  async update(id: number, data: any) {
+  async update(id: string, data: any) {
     return await this.userModel.updateOne({ _id: new ObjectId(id) }, { $set: data }).exec();
   }
 
@@ -70,5 +79,21 @@ export class UserService {
       return user;
     }
     throw new BadRequestException('Invalid role');
+  }
+
+  async resendVerification(id: any) {
+    const user = await this.findOneById(id);
+
+    const data = {
+      username: user.username,
+      url: generateActivationUrl((user as any)._id.toHexString(), user.email),
+    };
+    const template = MailTemplates.getTemplate('email-verification');
+    await sendMail({
+      from: `Špajza <${env.MAIL_ADDRESS}>`,
+      to: user.email,
+      subject: 'Registracija v Špajzo',
+      html: template(data),
+    });
   }
 }

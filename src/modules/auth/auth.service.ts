@@ -24,7 +24,7 @@ export class AuthService {
     };
     return {
       access_token: this.jwtService.sign(payload, {
-        expiresIn: saveme ? '7d' : '2d'
+        expiresIn: saveme ? '7d' : '2d',
       }),
       username: user?.username,
       userId: user?._id?.toHexString(),

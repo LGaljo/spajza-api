@@ -210,23 +210,22 @@ export class InventoryItemsService {
     delete object.categoryId;
     await this.tracingService.saveChange('inventoryitem', objBefore, object, context?.user._id);
 
-    return this.inventoryItemModel
-      .updateOne({ _id: new ObjectId(id) }, { $set: object })
-      .exec();
+    return this.inventoryItemModel.updateOne({ _id: new ObjectId(id) }, { $set: object }).exec();
   }
 
   async updateCoverImage(file: any, id: string): Promise<any> {
-    const key = `item/${id}/original_${new ObjectId().toHexString()}.${file.mimetype.split('/')[1]}`;
+    const key = `item/${id}/original_${new ObjectId().toHexString()}.${
+      file.mimetype.split('/')[1]
+    }`;
     const image = await Jimp.read(file.buffer);
     image.resize(800, Jimp.AUTO, Jimp.RESIZE_NEAREST_NEIGHBOR).quality(50);
-    // image.re
     image.getBuffer(file.mimetype, async (err, img) => {
       if (err) throw err;
       const response = await s3.upload(key, file.mimetype, img);
-      this.inventoryItemModel
+      await this.inventoryItemModel
         .updateOne({ _id: new ObjectId(id) }, { $set: { cover: response } })
         .exec();
-    })
+    });
   }
 
   async exists(_id: string): Promise<boolean> {

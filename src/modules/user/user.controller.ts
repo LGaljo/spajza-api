@@ -27,14 +27,28 @@ export class UserController {
   public async registerUser(@Req() request: IRequest): Promise<any> {
     const { body } = request;
 
-    if (
-      body.hasOwnProperty('username') &&
-      body.hasOwnProperty('email') &&
-      body.hasOwnProperty('password') &&
-      body.hasOwnProperty('username')
-    ) {
-      delete body.role;
-      return this.userService.create(body);
+    try {
+      if (
+        body.hasOwnProperty('username') &&
+        body.hasOwnProperty('email') &&
+        body.hasOwnProperty('password') &&
+        body.hasOwnProperty('username')
+      ) {
+        delete body.role;
+        return {
+          user: await this.userService.create(body),
+          success: true,
+        };
+      }
+    } catch (err) {
+      console.log(err);
+      if (err?.code === 11000) {
+        return {
+          success: false,
+          code: err?.code,
+          key: err?.keyValue,
+        };
+      }
     }
 
     throw new BadRequestException('Missing user fields');
@@ -47,7 +61,7 @@ export class UserController {
   public async updateUser(@Req() request: IRequest): Promise<any> {
     const { body, params } = request;
 
-    return this.userService.update(Number(params.id), body);
+    return this.userService.update(params.id, body);
   }
 
   @Put('/:id/role')

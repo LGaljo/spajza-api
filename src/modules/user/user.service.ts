@@ -29,6 +29,13 @@ export class UserService {
     return createdUser;
   }
 
+  async changePassword(id: any, password: string) {
+    const user = await this.userModel.findOne({ _id: new ObjectId(id) }).exec();
+    user.hash = await bcrypt.hash(password, env.SALT_ROUNDS);
+    user.salt = env.SALT_ROUNDS;
+    await this.userModel.updateOne({ _id: new ObjectId(id) }, { $set: user }).exec();
+  }
+
   async findAll(keepHash = false): Promise<User[]> {
     const docs = await this.userModel.find().exec();
 

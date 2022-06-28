@@ -28,7 +28,6 @@ export class ContextMiddleware implements NestMiddleware {
       if (req?.headers?.authorization) {
         const payload: any = this.jwtService.decode(req?.headers?.authorization.split(' ')[1]);
         user = await this.usersService.findOneById(payload?.userId);
-        req.user = user;
       }
     } catch (err) {
       console.log(err);

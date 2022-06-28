@@ -11,7 +11,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
       secretOrKey: env.JWT_SECRET,
-      subject: JwtTokenType.USER_RESET_PASSWORD,
+      subject: JwtTokenType.CHANGE_PASSWORD,
     });
   }
 

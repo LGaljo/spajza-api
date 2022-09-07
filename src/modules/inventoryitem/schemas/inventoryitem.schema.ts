@@ -54,6 +54,9 @@ export class InventoryItem {
 
   @Prop({ default: new Date() })
   boughtTime: Date;
+
+  @Prop({ type: Object })
+  extras: any;
 }
 
 export const InventoryItemsSchema = SchemaFactory.createForClass(InventoryItem);

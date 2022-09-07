@@ -5,7 +5,7 @@ import { AuthService } from './auth.service';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 import { Role } from '../user/schemas/roles.enum';
 import { UserService } from '../user/user.service';
-import { generateActivationUrl, generateChangePasswordUrl, JwtTokenType, parseToken } from '../../lib/jwt';
+import { generateChangePasswordUrl, JwtTokenType, parseToken } from '../../lib/jwt';
 import * as bcrypt from 'bcrypt';
 import { env } from '../../config/env';
 import { sendMail } from '../../lib/smtp';

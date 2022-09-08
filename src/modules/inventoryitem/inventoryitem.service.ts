@@ -128,6 +128,7 @@ export class InventoryItemsService {
             renter: { $first: '$userobj' },
             owner: { $first: '$owner' },
             status: { $first: '$status' },
+            extras: { $first: '$extras' },
           },
         },
       ])
@@ -187,6 +188,7 @@ export class InventoryItemsService {
             renter: { $first: '$userobj' },
             owner: { $first: '$owner' },
             status: { $first: '$status' },
+            extras: { $first: '$extras' },
           },
         },
       ])
@@ -210,7 +212,9 @@ export class InventoryItemsService {
     delete object.categoryId;
     await this.tracingService.saveChange('inventoryitem', objBefore, object, context?.user._id);
 
-    return this.inventoryItemModel.updateOne({ _id: new ObjectId(id) }, { $set: object }).exec();
+    await this.inventoryItemModel.updateOne({ _id: new ObjectId(id) }, { $set: object }).exec();
+
+    return this.findOne(object._id);
   }
 
   async updateCoverImage(file: any, id: string): Promise<any> {
@@ -218,7 +222,7 @@ export class InventoryItemsService {
       file.mimetype.split('/')[1]
     }`;
     const image = await Jimp.read(file.buffer);
-    image.resize(800, Jimp.AUTO, Jimp.RESIZE_NEAREST_NEIGHBOR).quality(50);
+    image.resize(800, Jimp.AUTO, Jimp.RESIZE_NEAREST_NEIGHBOR).quality(80);
     image.getBuffer(file.mimetype, async (err, img) => {
       if (err) throw err;
       const response = await s3.upload(key, file.mimetype, img);

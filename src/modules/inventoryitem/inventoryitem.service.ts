@@ -222,7 +222,19 @@ export class InventoryItemsService {
       file.mimetype.split('/')[1]
     }`;
     const image = await Jimp.read(file.buffer);
-    image.resize(800, Jimp.AUTO, Jimp.RESIZE_NEAREST_NEIGHBOR).quality(80);
+    const w = image.getWidth();
+    const h = image.getHeight();
+    if (h !== w) {
+      image.crop(
+        w < h ? 0 : Math.abs(w - h) / 2 - 1,
+        w < h ? Math.abs(w - h) / 2 - 1 : 0,
+        Math.min(w, h),
+        Math.min(w, h),
+      );
+    }
+    image
+      .resize(Math.min(Math.min(w, h), 800), Jimp.AUTO, Jimp.RESIZE_NEAREST_NEIGHBOR)
+      .quality(80);
     image.getBuffer(file.mimetype, async (err, img) => {
       if (err) throw err;
       const response = await s3.upload(key, file.mimetype, img);

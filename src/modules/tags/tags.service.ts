@@ -19,19 +19,19 @@ export class TagsService {
   }
 
   async findAll(): Promise<TagDocument[]> {
-    return await this.model.find().sort({ name: 1 }).exec();
+    return this.model.find().sort({ name: 1 }).exec();
   }
 
-  async findOneById(id: string): Promise<TagDocument> {
-    return await this.model.findOne({ _id: new ObjectId(id) }).exec();
+  async findOneById(id: ObjectId): Promise<TagDocument> {
+    return this.model.findOne({ _id: new ObjectId(id) }).exec();
   }
 
   async findOneByName(name: string): Promise<TagDocument> {
-    return await this.model.findOne({ name }).exec();
+    return this.model.findOne({ name }).exec();
   }
 
-  async updateOne(body: any, id: string): Promise<any> {
-    return await this.model.updateOne({ _id: new ObjectId(id) }, { $set: body }).exec();
+  async updateOne(body: any, id: ObjectId): Promise<any> {
+    return this.model.updateOne({ _id: new ObjectId(id) }, { $set: body }).exec();
   }
 
   async deleteOne(id: string): Promise<any> {
@@ -42,7 +42,7 @@ export class TagsService {
     if (countItems > 0) {
       throw new BadRequestException('There are still objects in this category');
     }
-    return await this.model.deleteOne({ _id: new ObjectId(id) }).exec();
+    return this.model.deleteOne({ _id: new ObjectId(id) }).exec();
   }
 
   async exists(id: string): Promise<boolean> {

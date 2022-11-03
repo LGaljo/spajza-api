@@ -53,6 +53,9 @@ export class InventoryItem {
   _createdAt: Date;
 
   @Prop({ default: new Date() })
+  _updatedAt: Date;
+
+  @Prop({ default: new Date() })
   boughtTime: Date;
 
   @Prop({ type: Object })

@@ -59,10 +59,16 @@ export class InventoryItemsService {
     return createdInventoryItem;
   }
 
-  async findAll(limit = 50, skip = 0, query: any): Promise<any> {
+  async findAll(
+    limit = 50,
+    skip = 0,
+    sort_field = null,
+    sort_dir = 'asc',
+    query: any,
+  ): Promise<any> {
     const { category, tags, statuses, search } = query;
     const filter = {};
-    let sort: any = { _id: -1 };
+    const sort: any = {};
     category ? (filter['category'] = new ObjectId(category)) : null;
     if (tags) {
       filter['tags'] = { $in: tags.map((t: any) => new ObjectId(t)) };
@@ -70,9 +76,12 @@ export class InventoryItemsService {
     if (statuses) {
       filter['status'] = { $in: statuses.map((s: any) => s) };
     }
+    if (sort_field) {
+      sort[sort_field] = sort_dir === 'asc' ? 1 : -1;
+    }
     if (search) {
       filter['$text'] = { $search: search };
-      sort = { score: { $meta: 'textScore' } };
+      sort['score'] = { $meta: 'textScore' };
     }
 
     return this.inventoryItemModel
@@ -209,6 +218,7 @@ export class InventoryItemsService {
     if (!object?.cover && objBefore?.cover?.Key) {
       await s3.remove(objBefore?.cover?.Key);
     }
+    object._updatedAt = new Date();
     delete object.categoryId;
     await this.tracingService.saveChange('inventoryitem', objBefore, object, context?.user._id);
 

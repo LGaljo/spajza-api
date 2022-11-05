@@ -1,8 +1,8 @@
 import { Controller, Delete, Get, Post, Put, Req, UseGuards } from '@nestjs/common';
-import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
-import { Roles } from 'src/guards/roles.decorator';
-import { RolesGuard } from 'src/guards/roles.guard';
-import { IRequest } from 'src/middlewares/context.middleware';
+import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
+import { Roles } from '../../guards/roles.decorator';
+import { RolesGuard } from '../../guards/roles.guard';
+import { IRequest } from '../../middlewares/context.middleware';
 import { Role } from '../user/schemas/roles.enum';
 import { WishlistService } from './wishlist.service';
 

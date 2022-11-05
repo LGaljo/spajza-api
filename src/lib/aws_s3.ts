@@ -1,5 +1,5 @@
 import * as aws from 'aws-sdk';
-import { env } from 'src/config/env';
+import { env } from '../config/env';
 
 export function createClient() {
   return new aws.S3({

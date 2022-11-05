@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Context } from 'src/context';
+import { Context } from '../../context';
 import { Wishlist, WishlistDocument } from './wishlist.schema';
 import { ObjectId } from 'mongodb';
 

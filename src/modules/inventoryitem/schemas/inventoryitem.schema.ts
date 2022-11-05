@@ -52,7 +52,7 @@ export class InventoryItem {
   @Prop({ default: new Date() })
   _createdAt: Date;
 
-  @Prop({ default: new Date() })
+  @Prop()
   _updatedAt: Date;
 
   @Prop({ default: new Date() })

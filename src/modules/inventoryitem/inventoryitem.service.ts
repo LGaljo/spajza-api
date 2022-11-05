@@ -64,7 +64,7 @@ export class InventoryItemsService {
     skip = 0,
     sort_field = null,
     sort_dir = 'asc',
-    query: any,
+    query: any = {},
   ): Promise<any> {
     const { category, tags, statuses, search } = query;
     const filter = {};
@@ -85,124 +85,143 @@ export class InventoryItemsService {
     }
 
     return this.inventoryItemModel
-      .aggregate([
-        { $match: filter },
-        { $sort: sort },
-        { $skip: skip },
-        { $limit: limit },
-        { $unwind: { path: '$tags', preserveNullAndEmptyArrays: true } },
-        {
-          $lookup: {
-            from: 'categories',
-            localField: 'category',
-            foreignField: '_id',
-            as: 'categoryobj',
-          },
-        },
-        {
-          $lookup: {
-            from: 'tags',
-            localField: 'tags',
-            foreignField: '_id',
-            as: 'tagsgroup',
-          },
-        },
-        {
-          $lookup: {
-            from: 'users',
-            localField: 'rents.renter',
-            foreignField: '_id',
-            as: 'userobj',
-          },
-        },
-        { $unwind: { path: '$tagsgroup', preserveNullAndEmptyArrays: true } },
-        { $unwind: { path: '$categoryobj', preserveNullAndEmptyArrays: true } },
-        { $unwind: { path: '$userobj', preserveNullAndEmptyArrays: true } },
-        {
-          $group: {
-            _id: '$_id',
-            name: { $first: '$name' },
-            code: { $first: '$code' },
-            cover: { $first: '$cover' },
-            tags: { $addToSet: '$tagsgroup' },
-            category: { $first: '$categoryobj' },
-            categoryId: { $first: '$category' },
-            boughtTime: { $first: '$boughtTime' },
-            _createdAt: { $first: '$_createdAt' },
-            retired: { $first: '$retired' },
-            description: { $first: '$description' },
-            count: { $first: '$count' },
-            location: { $first: '$location' },
-            rents: { $first: '$rents' },
-            renter: { $first: '$userobj' },
-            owner: { $first: '$owner' },
-            status: { $first: '$status' },
-            extras: { $first: '$extras' },
-          },
-        },
-      ])
+      .find(filter)
+      .sort(sort)
+      .skip(skip)
+      .limit(limit)
+      .populate('category')
+      .populate('tags')
+      .populate({ path: 'rents.renter', model: 'User' })
       .exec();
+
+    // return this.inventoryItemModel
+    //   .aggregate([
+    //     { $match: filter },
+    //     { $sort: sort },
+    //     { $skip: skip },
+    //     { $limit: limit },
+    //     { $unwind: { path: '$tags', preserveNullAndEmptyArrays: true } },
+    //     {
+    //       $lookup: {
+    //         from: 'categories',
+    //         localField: 'category',
+    //         foreignField: '_id',
+    //         as: 'categoryobj',
+    //       },
+    //     },
+    //     {
+    //       $lookup: {
+    //         from: 'tags',
+    //         localField: 'tags',
+    //         foreignField: '_id',
+    //         as: 'tagsgroup',
+    //       },
+    //     },
+    //     {
+    //       $lookup: {
+    //         from: 'users',
+    //         localField: 'rents.renter',
+    //         foreignField: '_id',
+    //         as: 'userobj',
+    //       },
+    //     },
+    //     { $unwind: { path: '$tagsgroup', preserveNullAndEmptyArrays: true } },
+    //     { $unwind: { path: '$categoryobj', preserveNullAndEmptyArrays: true } },
+    //     { $unwind: { path: '$userobj', preserveNullAndEmptyArrays: true } },
+    //     {
+    //       $group: {
+    //         _id: '$_id',
+    //         name: { $first: '$name' },
+    //         code: { $first: '$code' },
+    //         cover: { $first: '$cover' },
+    //         tags: { $addToSet: '$tagsgroup' },
+    //         category: { $first: '$categoryobj' },
+    //         categoryId: { $first: '$category' },
+    //         boughtTime: { $first: '$boughtTime' },
+    //         _createdAt: { $first: '$_createdAt' },
+    //         _updatedAt: { $first: '$_updatedAt' },
+    //         retired: { $first: '$retired' },
+    //         description: { $first: '$description' },
+    //         count: { $first: '$count' },
+    //         location: { $first: '$location' },
+    //         rents: { $first: '$rents' },
+    //         renter: { $first: '$userobj' },
+    //         owner: { $first: '$owner' },
+    //         status: { $first: '$status' },
+    //         extras: { $first: '$extras' },
+    //       },
+    //     },
+    //   ])
+    //   .exec();
   }
 
   async findOne(id: string): Promise<any> {
     return this.inventoryItemModel
-      .aggregate([
-        {
-          $match: { _id: new ObjectId(id) },
-        },
-        { $unwind: { path: '$tags', preserveNullAndEmptyArrays: true } },
-        {
-          $lookup: {
-            from: 'categories',
-            localField: 'category',
-            foreignField: '_id',
-            as: 'categoryobj',
-          },
-        },
-        {
-          $lookup: {
-            from: 'tags',
-            localField: 'tags',
-            foreignField: '_id',
-            as: 'tagsgroup',
-          },
-        },
-        {
-          $lookup: {
-            from: 'users',
-            localField: 'rents.renter',
-            foreignField: '_id',
-            as: 'userobj',
-          },
-        },
-        { $unwind: { path: '$tagsgroup', preserveNullAndEmptyArrays: true } },
-        { $unwind: { path: '$categoryobj', preserveNullAndEmptyArrays: true } },
-        { $unwind: { path: '$userobj', preserveNullAndEmptyArrays: true } },
-        {
-          $group: {
-            _id: '$_id',
-            name: { $first: '$name' },
-            code: { $first: '$code' },
-            cover: { $first: '$cover' },
-            tags: { $addToSet: '$tagsgroup' },
-            category: { $first: '$categoryobj' },
-            categoryId: { $first: '$category' },
-            boughtTime: { $first: '$boughtTime' },
-            _createdAt: { $first: '$_createdAt' },
-            retired: { $first: '$retired' },
-            description: { $first: '$description' },
-            count: { $first: '$count' },
-            location: { $first: '$location' },
-            rents: { $first: '$rents' },
-            renter: { $first: '$userobj' },
-            owner: { $first: '$owner' },
-            status: { $first: '$status' },
-            extras: { $first: '$extras' },
-          },
-        },
-      ])
-      .exec()
-      .then((doc: any[]) => doc[0]);
+      .findOne({ _id: new ObjectId(id) })
+      .populate('category')
+      .populate('tags')
+      .populate({ path: 'rents.renter', model: 'User' })
+      .exec();
+
+    // return this.inventoryItemModel
+    //   .aggregate([
+    //     {
+    //       $match: { _id: new ObjectId(id) },
+    //     },
+    //     { $unwind: { path: '$tags', preserveNullAndEmptyArrays: true } },
+    //     {
+    //       $lookup: {
+    //         from: 'categories',
+    //         localField: 'category',
+    //         foreignField: '_id',
+    //         as: 'categoryobj',
+    //       },
+    //     },
+    //     {
+    //       $lookup: {
+    //         from: 'tags',
+    //         localField: 'tags',
+    //         foreignField: '_id',
+    //         as: 'tagsgroup',
+    //       },
+    //     },
+    //     {
+    //       $lookup: {
+    //         from: 'users',
+    //         localField: 'rents.renter',
+    //         foreignField: '_id',
+    //         as: 'userobj',
+    //       },
+    //     },
+    //     { $unwind: { path: '$tagsgroup', preserveNullAndEmptyArrays: true } },
+    //     { $unwind: { path: '$categoryobj', preserveNullAndEmptyArrays: true } },
+    //     { $unwind: { path: '$userobj', preserveNullAndEmptyArrays: true } },
+    //     {
+    //       $group: {
+    //         _id: '$_id',
+    //         name: { $first: '$name' },
+    //         code: { $first: '$code' },
+    //         cover: { $first: '$cover' },
+    //         tags: { $addToSet: '$tagsgroup' },
+    //         category: { $first: '$categoryobj' },
+    //         categoryId: { $first: '$category' },
+    //         boughtTime: { $first: '$boughtTime' },
+    //         _createdAt: { $first: '$_createdAt' },
+    //         _updatedAt: { $first: '$_updatedAt' },
+    //         retired: { $first: '$retired' },
+    //         description: { $first: '$description' },
+    //         count: { $first: '$count' },
+    //         location: { $first: '$location' },
+    //         rents: { $first: '$rents' },
+    //         renter: { $first: '$userobj' },
+    //         owner: { $first: '$owner' },
+    //         status: { $first: '$status' },
+    //         extras: { $first: '$extras' },
+    //       },
+    //     },
+    //   ])
+    //   .exec()
+    //   .then((doc: any[]) => doc[0]);
   }
 
   async updateOne(context: Context, object: any, id: string): Promise<any> {

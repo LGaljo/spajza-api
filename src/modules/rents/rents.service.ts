@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Context } from 'src/context';
+import { Context } from '../../context';
 import { InventoryItemsService } from '../inventoryitem/inventoryitem.service';
 import { InventoryItem } from '../inventoryitem/schemas/inventoryitem.schema';
 import { ObjectId } from 'mongodb';

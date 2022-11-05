@@ -65,7 +65,7 @@ export class InventoryItemsController {
       throw new BadRequestException('Empty body');
     }
     for (const item of body) {
-      this.service.create(item)
+      await this.service.create(item);
     }
   }
 

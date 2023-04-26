@@ -132,8 +132,8 @@ export class InventoryItemsService {
       file.mimetype.split('/')[1]
     }`;
 
-    const bffr = await sharp(file.buffer).jpeg({ mozjpeg: true, quality: 100 }).toBuffer();
-    const image = await Jimp.read(bffr);
+    let buffer = await sharp(file.buffer).jpeg({ mozjpeg: true, quality: 100 }).toBuffer();
+    const image = await Jimp.read(buffer);
     const w = image.getWidth();
     const h = image.getHeight();
     if (h !== w) {
@@ -147,13 +147,11 @@ export class InventoryItemsService {
     image
       .resize(Math.min(Math.min(w, h), 800), Jimp.AUTO, Jimp.RESIZE_NEAREST_NEIGHBOR)
       .quality(80);
-    image.getBuffer('image/jpeg', async (err, img) => {
-      if (err) throw err;
-      const response = await s3.upload(key, file.mimetype, img);
-      await this.inventoryItemModel
-        .updateOne({ _id: new ObjectId(id) }, { $set: { cover: response } })
-        .exec();
-    });
+    buffer = await image.getBufferAsync('image/jpeg');
+    const response = await s3.upload(key, 'image/jpeg', buffer);
+    await this.inventoryItemModel
+      .updateOne({ _id: new ObjectId(id) }, { $set: { cover: response } })
+      .exec();
   }
 
   async exists(_id: string): Promise<boolean> {

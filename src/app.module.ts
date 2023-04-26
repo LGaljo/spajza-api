@@ -2,6 +2,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './modules/auth/auth.module';
 import { CategoriesModule } from './modules/categories/categories.module';
+import { CommentsModule } from './modules/comments/comments.module';
 import { ContextMiddleware } from './middlewares/context.middleware';
 import { CountersModule } from './modules/counters/counters.module';
 import { InventoryitemModule } from './modules/inventoryitem/inventoryitem.module';
@@ -34,6 +35,7 @@ import { env } from './config/env';
     TracingModule,
     RentsModule,
     WishlistModule,
+    CommentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

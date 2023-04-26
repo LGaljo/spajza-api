@@ -132,8 +132,8 @@ export class InventoryItemsService {
       file.mimetype.split('/')[1]
     }`;
 
-    const bffr = await sharp(file.buffer).jpeg({ mozjpeg: true, quality: 100 }).toBuffer();
-    const image = await Jimp.read(bffr);
+    const buffer = await sharp(file.buffer).jpeg({ mozjpeg: true, quality: 100 }).toBuffer();
+    const image = await Jimp.read(buffer);
     const w = image.getWidth();
     const h = image.getHeight();
     if (h !== w) {

@@ -1,21 +1,21 @@
-import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { ContextMiddleware } from './middlewares/context.middleware';
-import { MongooseModule } from '@nestjs/mongoose';
-import { env } from './config/env';
-import { InventoryitemModule } from './modules/inventoryitem/inventoryitem.module';
-import { TagsModule } from './modules/tags/tags.module';
-import { CategoriesModule } from './modules/categories/categories.module';
 import { AuthModule } from './modules/auth/auth.module';
-import { UserModule } from './modules/user/user.module';
+import { CategoriesModule } from './modules/categories/categories.module';
+import { ContextMiddleware } from './middlewares/context.middleware';
+import { CountersModule } from './modules/counters/counters.module';
+import { InventoryitemModule } from './modules/inventoryitem/inventoryitem.module';
+import { JwtModule } from '@nestjs/jwt';
+import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
+import { MongooseModule } from '@nestjs/mongoose';
+import { RentsModule } from './modules/rents/rents.module';
 import { RequestLog, RequestLogSchema } from './modules/request-log/request-log.schema';
 import { RequestLogMiddleware } from './middlewares/request-log.middleware';
-import { JwtModule, JwtService } from '@nestjs/jwt';
-import { CountersModule } from './modules/counters/counters.module';
+import { TagsModule } from './modules/tags/tags.module';
 import { TracingModule } from './modules/tracing/tracing.module';
-import { RentsModule } from './modules/rents/rents.module';
+import { UserModule } from './modules/user/user.module';
 import { WishlistModule } from './modules/wishlist/wishlist.module';
+import { env } from './config/env';
 
 @Module({
   imports: [

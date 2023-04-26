@@ -14,6 +14,7 @@ import { Trace, TraceDocument } from '../tracing/schema/tracing.schema';
 import { Context } from '../../context';
 import * as s3 from '../../lib/aws_s3';
 import * as Jimp from 'jimp';
+import * as sharp from 'sharp';
 
 @Injectable()
 export class InventoryItemsService {
@@ -93,66 +94,6 @@ export class InventoryItemsService {
       .populate('tags')
       .populate({ path: 'rents.renter', model: 'User' })
       .exec();
-
-    // return this.inventoryItemModel
-    //   .aggregate([
-    //     { $match: filter },
-    //     { $sort: sort },
-    //     { $skip: skip },
-    //     { $limit: limit },
-    //     { $unwind: { path: '$tags', preserveNullAndEmptyArrays: true } },
-    //     {
-    //       $lookup: {
-    //         from: 'categories',
-    //         localField: 'category',
-    //         foreignField: '_id',
-    //         as: 'categoryobj',
-    //       },
-    //     },
-    //     {
-    //       $lookup: {
-    //         from: 'tags',
-    //         localField: 'tags',
-    //         foreignField: '_id',
-    //         as: 'tagsgroup',
-    //       },
-    //     },
-    //     {
-    //       $lookup: {
-    //         from: 'users',
-    //         localField: 'rents.renter',
-    //         foreignField: '_id',
-    //         as: 'userobj',
-    //       },
-    //     },
-    //     { $unwind: { path: '$tagsgroup', preserveNullAndEmptyArrays: true } },
-    //     { $unwind: { path: '$categoryobj', preserveNullAndEmptyArrays: true } },
-    //     { $unwind: { path: '$userobj', preserveNullAndEmptyArrays: true } },
-    //     {
-    //       $group: {
-    //         _id: '$_id',
-    //         name: { $first: '$name' },
-    //         code: { $first: '$code' },
-    //         cover: { $first: '$cover' },
-    //         tags: { $addToSet: '$tagsgroup' },
-    //         category: { $first: '$categoryobj' },
-    //         categoryId: { $first: '$category' },
-    //         boughtTime: { $first: '$boughtTime' },
-    //         _createdAt: { $first: '$_createdAt' },
-    //         _updatedAt: { $first: '$_updatedAt' },
-    //         retired: { $first: '$retired' },
-    //         description: { $first: '$description' },
-    //         count: { $first: '$count' },
-    //         location: { $first: '$location' },
-    //         rents: { $first: '$rents' },
-    //         renter: { $first: '$userobj' },
-    //         owner: { $first: '$owner' },
-    //         status: { $first: '$status' },
-    //         extras: { $first: '$extras' },
-    //       },
-    //     },
-    //   ])
-    //   .exec();
   }
 
   async findOne(id: string): Promise<any> {
@@ -162,66 +103,6 @@ export class InventoryItemsService {
       .populate('tags')
       .populate({ path: 'rents.renter', model: 'User' })
       .exec();
-
-    // return this.inventoryItemModel
-    //   .aggregate([
-    //     {
-    //       $match: { _id: new ObjectId(id) },
-    //     },
-    //     { $unwind: { path: '$tags', preserveNullAndEmptyArrays: true } },
-    //     {
-    //       $lookup: {
-    //         from: 'categories',
-    //         localField: 'category',
-    //         foreignField: '_id',
-    //         as: 'categoryobj',
-    //       },
-    //     },
-    //     {
-    //       $lookup: {
-    //         from: 'tags',
-    //         localField: 'tags',
-    //         foreignField: '_id',
-    //         as: 'tagsgroup',
-    //       },
-    //     },
-    //     {
-    //       $lookup: {
-    //         from: 'users',
-    //         localField: 'rents.renter',
-    //         foreignField: '_id',
-    //         as: 'userobj',
-    //       },
-    //     },
-    //     { $unwind: { path: '$tagsgroup', preserveNullAndEmptyArrays: true } },
-    //     { $unwind: { path: '$categoryobj', preserveNullAndEmptyArrays: true } },
-    //     { $unwind: { path: '$userobj', preserveNullAndEmptyArrays: true } },
-    //     {
-    //       $group: {
-    //         _id: '$_id',
-    //         name: { $first: '$name' },
-    //         code: { $first: '$code' },
-    //         cover: { $first: '$cover' },
-    //         tags: { $addToSet: '$tagsgroup' },
-    //         category: { $first: '$categoryobj' },
-    //         categoryId: { $first: '$category' },
-    //         boughtTime: { $first: '$boughtTime' },
-    //         _createdAt: { $first: '$_createdAt' },
-    //         _updatedAt: { $first: '$_updatedAt' },
-    //         retired: { $first: '$retired' },
-    //         description: { $first: '$description' },
-    //         count: { $first: '$count' },
-    //         location: { $first: '$location' },
-    //         rents: { $first: '$rents' },
-    //         renter: { $first: '$userobj' },
-    //         owner: { $first: '$owner' },
-    //         status: { $first: '$status' },
-    //         extras: { $first: '$extras' },
-    //       },
-    //     },
-    //   ])
-    //   .exec()
-    //   .then((doc: any[]) => doc[0]);
   }
 
   async updateOne(context: Context, object: any, id: string): Promise<any> {
@@ -250,7 +131,9 @@ export class InventoryItemsService {
     const key = `item/${id}/original_${new ObjectId().toHexString()}.${
       file.mimetype.split('/')[1]
     }`;
-    const image = await Jimp.read(file.buffer);
+
+    const bffr = await sharp(file.buffer).jpeg({ mozjpeg: true, quality: 100 }).toBuffer();
+    const image = await Jimp.read(bffr);
     const w = image.getWidth();
     const h = image.getHeight();
     if (h !== w) {
@@ -264,7 +147,7 @@ export class InventoryItemsService {
     image
       .resize(Math.min(Math.min(w, h), 800), Jimp.AUTO, Jimp.RESIZE_NEAREST_NEIGHBOR)
       .quality(80);
-    image.getBuffer(file.mimetype, async (err, img) => {
+    image.getBuffer('image/jpeg', async (err, img) => {
       if (err) throw err;
       const response = await s3.upload(key, file.mimetype, img);
       await this.inventoryItemModel

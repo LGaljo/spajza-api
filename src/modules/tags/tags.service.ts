@@ -19,34 +19,34 @@ export class TagsService {
   }
 
   async findAll(): Promise<TagDocument[]> {
-    return this.model.find().sort({ name: 1 }).exec();
+    return this.model.find({ _deletedAt: null }).sort({ name: 1 }).exec();
   }
 
   async findOneById(id: ObjectId): Promise<TagDocument> {
-    return this.model.findOne({ _id: new ObjectId(id) }).exec();
+    return this.model.findOne({ _id: new ObjectId(id), _deletedAt: null }).exec();
   }
 
   async findOneByName(name: string): Promise<TagDocument> {
-    return this.model.findOne({ name }).exec();
+    return this.model.findOne({ name, _deletedAt: null }).exec();
   }
 
   async updateOne(body: any, id: ObjectId): Promise<any> {
-    return this.model.updateOne({ _id: new ObjectId(id) }, { $set: body }).exec();
+    return this.model.updateOne({ _id: new ObjectId(id), _deletedAt: null }, { $set: body }).exec();
   }
 
   async deleteOne(id: string): Promise<any> {
     const countItems = await this.modelItem
-      .find({ category: new ObjectId(id) })
+      .find({ category: new ObjectId(id), _deletedAt: null })
       .count()
       .exec();
     if (countItems > 0) {
-      throw new BadRequestException('There are still objects in this category');
+      throw new BadRequestException('There are still objects connected to the tag');
     }
-    return this.model.deleteOne({ _id: new ObjectId(id) }).exec();
+    await this.modelItem.updateOne({ _id: new ObjectId(id) }, { $set: { _deletedAt: new Date() } }).exec();
   }
 
-  async exists(id: string): Promise<boolean> {
-    const obj = await this.model.findOne({ _id: new ObjectId(id) }).exec();
-    return !!obj?._id;
-  }
+  // async exists(id: string): Promise<boolean> {
+  //   const obj = await this.model.findOne({ _id: new ObjectId(id), _deletedAt: null }).exec();
+  //   return !!obj?._id;
+  // }
 }

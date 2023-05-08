@@ -68,7 +68,7 @@ export class InventoryItemsService {
     query: any = {},
   ): Promise<any> {
     const { category, tags, statuses, search } = query;
-    const filter = {};
+    const filter = { _deletedAt: null };
     const sort: any = {};
     category ? (filter['category'] = new ObjectId(category)) : null;
     if (tags) {
@@ -98,7 +98,7 @@ export class InventoryItemsService {
 
   async findOne(id: string): Promise<any> {
     return this.inventoryItemModel
-      .findOne({ _id: new ObjectId(id) })
+      .findOne({ _id: new ObjectId(id), _deletedAt: null })
       .populate('category')
       .populate('tags')
       .populate({ path: 'rents.renter', model: 'User' })
@@ -148,18 +148,16 @@ export class InventoryItemsService {
     buffer = await image.getBufferAsync('image/jpeg');
     const response = await s3.upload(key, 'image/jpeg', buffer);
     await this.inventoryItemModel
-      .updateOne({ _id: new ObjectId(id) }, { $set: { cover: response } })
+      .updateOne({ _id: new ObjectId(id) }, { $set: { cover: response, _updatedAt: new Date() } })
       .exec();
   }
 
-  async exists(_id: string): Promise<boolean> {
-    const obj = await this.inventoryItemModel.findOne({ _id }).exec();
-    return !!obj?._id;
-  }
+  // async exists(_id: string): Promise<boolean> {
+  //   const obj = await this.inventoryItemModel.findOne({ _id, _deletedAt: null }).exec();
+  //   return !!obj?._id;
+  // }
 
   async deleteItem(_id: string) {
-    const objBefore = await this.inventoryItemModel.findOne({ _id: new ObjectId(_id) }).exec();
-    // await this.tracingService.saveChange('inventoryitem', 'remove', objBefore, null);
-    await this.inventoryItemModel.deleteOne({ _id }).exec();
+    await this.inventoryItemModel.updateOne({ _id }, { $set: { _deletedAt: new Date() } }).exec();
   }
 }

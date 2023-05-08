@@ -1,4 +1,4 @@
-import { BadRequestException, Controller, Get, Post, Put, Req, UseGuards } from '@nestjs/common';
+import { BadRequestException, Controller, Delete, Get, Post, Put, Req, UseGuards } from '@nestjs/common';
 import { IRequest } from '../../middlewares/context.middleware';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
@@ -72,5 +72,15 @@ export class UserController {
     const { body, params } = request;
 
     return this.userService.updateRole(params.id, body?.role);
+  }
+
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN)
+  public async deleteUser(@Req() request: IRequest): Promise<any> {
+    const { context, params } = request;
+
+    return this.userService.deleteUser(context, params.id);
   }
 }

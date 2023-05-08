@@ -7,26 +7,24 @@ import { ObjectId } from 'mongodb';
 
 @Injectable()
 export class WishlistService {
-    constructor(
-        @InjectModel(Wishlist.name) private model: Model<WishlistDocument>
-    ) { }
+  constructor(@InjectModel(Wishlist.name) private model: Model<WishlistDocument>) {}
 
-    async createItem(context: Context, body: any) {
-        const item = new this.model(body);
-        item.user = context.user?._id
-        await item.save();
-        return item;
-    }
+  async createItem(context: Context, body: any) {
+    const item = new this.model(body);
+    item.user = context.user?._id;
+    await item.save();
+    return item;
+  }
 
-    async updateItem(context: Context, id: number, body: any) {
-        return this.model.updateOne({ _id: new ObjectId(id) }, { $set: body }).exec();
-    }
+  async updateItem(context: Context, id: number, body: any) {
+    return this.model.updateOne({ _id: new ObjectId(id) }, { $set: body }).exec();
+  }
 
-    async getItems(context: Context) {
-        return this.model.find().sort({ order: 1 }).exec();
-    }
+  async getItems() {
+    return this.model.find({ _deletedAt: null }).sort({ order: 1 }).exec();
+  }
 
-    async removeItem(context: Context, id: number) {
-        return this.model.deleteOne({ _id: new ObjectId(id) }).exec();
-    }
+  async removeItem(context: Context, _id: number) {
+    await this.model.updateOne({ _id }, { $set: { _deletedAt: new Date() } }).exec();
+  }
 }

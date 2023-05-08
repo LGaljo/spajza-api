@@ -15,7 +15,7 @@ export class TagsController {
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN, Role.USER, Role.KEEPER)
-  public async getAll(@Req() request: IRequest): Promise<any> {
+  public async getAll(): Promise<any> {
     return await this.service.findAll();
   }
 

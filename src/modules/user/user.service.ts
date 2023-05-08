@@ -11,6 +11,7 @@ import { AuthService } from '../auth/auth.service';
 import { generateActivationUrl } from '../../lib/jwt';
 import { MailTemplates } from '../../lib/mail-templates';
 import { sendMail } from '../../lib/smtp';
+import { Context } from '../../context';
 
 @Injectable()
 export class UserService {
@@ -30,14 +31,14 @@ export class UserService {
   }
 
   async changePassword(id: any, password: string) {
-    const user = await this.userModel.findOne({ _id: new ObjectId(id) }).exec();
+    const user = await this.userModel.findOne({ _id: new ObjectId(id), _deletedAt: null }).exec();
     user.hash = await bcrypt.hash(password, env.SALT_ROUNDS);
     user.salt = env.SALT_ROUNDS;
     await this.userModel.updateOne({ _id: new ObjectId(id) }, { $set: user }).exec();
   }
 
   async findAll(keepHash = false): Promise<User[]> {
-    const docs = await this.userModel.find().exec();
+    const docs = await this.userModel.find({ _deletedAt: null }).exec();
 
     if (keepHash) {
       return docs;
@@ -52,7 +53,7 @@ export class UserService {
 
   async findOneByUsernameOrEmail(value: string, keepHash = false): Promise<UserDocument> {
     const obj = await this.userModel
-      .findOne({ $or: [{ username: value }, { email: value }] })
+      .findOne({ $or: [{ username: value }, { email: value }], _deletedAt: null })
       .exec();
 
     if (!keepHash) {
@@ -63,7 +64,7 @@ export class UserService {
   }
 
   async findOneById(id: string, keepHash = false): Promise<UserDocument> {
-    const obj = await this.userModel.findOne({ _id: new ObjectId(id) }).exec();
+    const obj = await this.userModel.findOne({ _id: new ObjectId(id), _deletedAt: null }).exec();
 
     if (obj && !keepHash) {
       delete obj.hash;
@@ -73,15 +74,19 @@ export class UserService {
   }
 
   async update(id: string, data: any) {
-    return await this.userModel.updateOne({ _id: new ObjectId(id) }, { $set: data }).exec();
+    return await this.userModel
+      .updateOne({ _id: new ObjectId(id), _deletedAt: null }, { $set: data })
+      .exec();
   }
 
   async updateRole(id: string, role: string) {
     const r = Role[role];
     if (r) {
-      const user = await this.userModel.findOne({ _id: new ObjectId(id) }).exec();
+      const user = await this.userModel.findOne({ _id: new ObjectId(id), _deletedAt: null }).exec();
       user.role = r;
-      await this.userModel.updateOne({ _id: new ObjectId(id) }, { $set: user }).exec();
+      await this.userModel
+        .updateOne({ _id: new ObjectId(id), _deletedAt: null }, { $set: user })
+        .exec();
 
       return user;
     }
@@ -102,5 +107,9 @@ export class UserService {
       subject: 'Registracija v Špajzo',
       html: template(data),
     });
+  }
+
+  async deleteUser(context: Context, _id: any) {
+    await this.userModel.updateOne({ _id }, { $set: { _deletedAt: new Date() } }).exec();
   }
 }

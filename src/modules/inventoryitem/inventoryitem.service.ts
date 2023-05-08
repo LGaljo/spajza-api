@@ -144,9 +144,7 @@ export class InventoryItemsService {
         Math.min(w, h),
       );
     }
-    image
-      .resize(Math.min(Math.min(w, h), 800), Jimp.AUTO, Jimp.RESIZE_NEAREST_NEIGHBOR)
-      .quality(80);
+    image.resize(Math.min(Math.min(w, h), 800), Jimp.AUTO, Jimp.RESIZE_BEZIER).quality(90);
     buffer = await image.getBufferAsync('image/jpeg');
     const response = await s3.upload(key, 'image/jpeg', buffer);
     await this.inventoryItemModel

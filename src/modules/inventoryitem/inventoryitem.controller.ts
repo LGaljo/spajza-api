@@ -31,8 +31,10 @@ export class InventoryItemsController {
 
     const limit = Number(query?.limit) || 15;
     const skip = Number(query?.skip) || 0;
+    const sort = query?.sort;
+    const dir = query?.sort_dir;
 
-    return this.service.findAll(limit, skip, query);
+    return this.service.findAll(limit, skip, sort, dir, query);
   }
 
   @Get(':id')
@@ -63,7 +65,7 @@ export class InventoryItemsController {
       throw new BadRequestException('Empty body');
     }
     for (const item of body) {
-      this.service.create(item)
+      await this.service.create(item);
     }
   }
 

@@ -7,6 +7,9 @@ export type TagDocument = Tag & Document;
 export class Tag {
   @Prop()
   name: string;
+
+  @Prop()
+  _deletedAt: Date;
 }
 
 export const TagsSchema = SchemaFactory.createForClass(Tag);

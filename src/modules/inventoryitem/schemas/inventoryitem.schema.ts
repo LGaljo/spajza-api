@@ -3,6 +3,7 @@ import { Category } from '../../categories/schemas/category.schema';
 import { Tag } from '../../tags/schemas/tag.schema';
 import { ObjectId } from 'mongodb';
 import { ItemStatus } from './itemstatus.enum';
+import { Types } from 'mongoose';
 
 export type InventoryItemDocument = InventoryItem & Document;
 
@@ -28,7 +29,7 @@ export class InventoryItem {
   @Prop()
   count: number;
 
-  @Prop({ type: Array, ref: 'Tag', default: [] })
+  @Prop({ type: [{ type: Types.ObjectId, ref: Tag.name, default: [] }] })
   tags: Tag[];
 
   @Prop()
@@ -52,8 +53,17 @@ export class InventoryItem {
   @Prop({ default: new Date() })
   _createdAt: Date;
 
+  @Prop()
+  _updatedAt: Date;
+
+  @Prop()
+  _deletedAt: Date;
+
   @Prop({ default: new Date() })
   boughtTime: Date;
+
+  @Prop({ type: Object })
+  extras: any;
 }
 
 export const InventoryItemsSchema = SchemaFactory.createForClass(InventoryItem);

@@ -25,6 +25,15 @@ export class User {
 
   @Prop()
   salt: number;
+
+  @Prop({ default: new Date() })
+  _createdAt: Date;
+
+  @Prop()
+  _updatedAt: Date;
+
+  @Prop()
+  _deletedAt: Date;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

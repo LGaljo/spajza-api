@@ -18,8 +18,12 @@ export class CategoriesService {
     return item;
   }
 
-  async findAll(): Promise<CategoryDocument[]> {
-    return this.model.find({ _deletedAt: null }).sort({ name: 1 }).exec();
+  async findAll(options: any): Promise<CategoryDocument[]> {
+    const filter = { _deletedAt: null };
+    if (options?.url) {
+      filter['url'] = { $ne: null };
+    }
+    return this.model.find(filter).sort({ name: 1 }).exec();
   }
 
   async findOneById(id: ObjectId): Promise<CategoryDocument> {

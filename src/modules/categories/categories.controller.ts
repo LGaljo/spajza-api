@@ -1,4 +1,4 @@
-import { Controller, Delete, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { Controller, Delete, Get, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { IRequest } from '../../middlewares/context.middleware';
 import { CategoriesService } from './categories.service';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
@@ -15,8 +15,9 @@ export class CategoriesController {
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN, Role.USER, Role.KEEPER)
-  public async getAll(): Promise<any> {
-    return await this.service.findAll();
+  public async getAll(@Req() request: IRequest): Promise<any> {
+    const { query } = request;
+    return await this.service.findAll(query);
   }
 
   @Get(':id')

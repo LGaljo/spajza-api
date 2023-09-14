@@ -8,6 +8,9 @@ export class Category {
   name: string;
 
   @Prop()
+  url: string;
+
+  @Prop()
   _deletedAt: Date;
 }
 

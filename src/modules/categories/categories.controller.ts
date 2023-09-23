@@ -1,4 +1,15 @@
-import { Controller, Delete, Get, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Query,
+  Req,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import { IRequest } from '../../middlewares/context.middleware';
 import { CategoriesService } from './categories.service';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
@@ -6,6 +17,7 @@ import { RolesGuard } from '../../guards/roles.guard';
 import { Roles } from '../../guards/roles.decorator';
 import { Role } from '../user/schemas/roles.enum';
 import { ObjectId } from 'mongodb';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('categories')
 export class CategoriesController {
@@ -42,6 +54,20 @@ export class CategoriesController {
   @Roles(Role.ADMIN)
   public async updateOne(@Req() request: IRequest): Promise<any> {
     return await this.service.updateOne(request.body, request.params.id);
+  }
+
+  @Post('file/:id')
+  @UseInterceptors(FileInterceptor('file'))
+  public async updatePicture(@UploadedFile() file: Express.Multer.File, @Req() request: IRequest) {
+    const { params } = request;
+    return this.service.updateTemplateImage(file, params.id);
+  }
+
+  @Post('remove_file/:id')
+  @UseInterceptors(FileInterceptor('file'))
+  public async removePicture(@UploadedFile() file: Express.Multer.File, @Req() request: IRequest) {
+    const { params } = request;
+    return this.service.removeTemplateImage(params.id);
   }
 
   @Delete(':id')

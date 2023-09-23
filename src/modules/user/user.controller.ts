@@ -1,4 +1,13 @@
-import { BadRequestException, Controller, Delete, Get, Post, Put, Req, UseGuards } from '@nestjs/common';
+import {
+  BadRequestException,
+  Controller,
+  Delete,
+  Get,
+  Post,
+  Put,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { IRequest } from '../../middlewares/context.middleware';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
@@ -12,7 +21,7 @@ export class UserController {
 
   @Get()
   @UseGuards(JwtAuthGuard)
-  public async getUsers(@Req() _request: IRequest): Promise<any> {
+  public async getUsers(): Promise<any> {
     return this.userService.findAll();
   }
 

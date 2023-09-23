@@ -7,6 +7,9 @@ export class Category {
   @Prop()
   name: string;
 
+  @Prop({ type: Object })
+  templateImage: any;
+
   @Prop()
   _deletedAt: Date;
 }

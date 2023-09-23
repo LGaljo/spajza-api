@@ -1,5 +1,7 @@
 # Base image
-FROM node:16-alpine as builder
+FROM node:18-alpine as builder
+
+RUN apk add vips-dev libheif
 
 WORKDIR /app
 
@@ -12,11 +14,15 @@ RUN npm run build
 RUN rm -rf node_modules && \
   NODE_ENV=production npm ci
 
-FROM node:16-alpine
+FROM node:18-alpine
+
+RUN apk add vips-dev libheif
 
 WORKDIR /app
 
 COPY --from=builder --chown=node:node /app  .
+
+RUN npm install --build-from-source sharp
 
 USER node
 

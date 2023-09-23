@@ -7,7 +7,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { ObjectId } from 'mongodb';
 import { Role } from './schemas/roles.enum';
-import { AuthService } from '../auth/auth.service';
 import { generateActivationUrl } from '../../lib/jwt';
 import { MailTemplates } from '../../lib/mail-templates';
 import { sendMail } from '../../lib/smtp';
@@ -38,39 +37,51 @@ export class UserService {
   }
 
   async findAll(keepHash = false): Promise<User[]> {
-    const docs = await this.userModel.find({ _deletedAt: null }).exec();
-
+    const select = {
+      _id: 1,
+      username: 1,
+      email: 1,
+      role: 1,
+    };
     if (keepHash) {
-      return docs;
+      select['hash'] = 1;
+      select['salt'] = 1;
     }
-
-    return docs.map((doc) => {
-      delete doc.hash;
-      delete doc.salt;
-      return doc;
-    });
+    return await this.userModel.find({ _deletedAt: null }).select(select).exec();
   }
 
   async findOneByUsernameOrEmail(value: string, keepHash = false): Promise<UserDocument> {
-    const obj = await this.userModel
-      .findOne({ $or: [{ username: value }, { email: value }], _deletedAt: null })
-      .exec();
-
-    if (!keepHash) {
-      delete obj.hash;
-      delete obj.salt;
+    const select = {
+      _id: 1,
+      username: 1,
+      email: 1,
+      role: 1,
+    };
+    if (keepHash) {
+      select['hash'] = 1;
+      select['salt'] = 1;
     }
-    return obj;
+    return await this.userModel
+      .findOne({ $or: [{ username: value }, { email: value }], _deletedAt: null })
+      .select(select)
+      .exec();
   }
 
   async findOneById(id: string, keepHash = false): Promise<UserDocument> {
-    const obj = await this.userModel.findOne({ _id: new ObjectId(id), _deletedAt: null }).exec();
-
-    if (obj && !keepHash) {
-      delete obj.hash;
-      delete obj.salt;
+    const select = {
+      _id: 1,
+      username: 1,
+      email: 1,
+      role: 1,
+    };
+    if (keepHash) {
+      select['hash'] = 1;
+      select['salt'] = 1;
     }
-    return obj;
+    return await this.userModel
+      .findOne({ _id: new ObjectId(id), _deletedAt: null })
+      .select(select)
+      .exec();
   }
 
   async update(id: string, data: any) {
@@ -88,7 +99,7 @@ export class UserService {
         .updateOne({ _id: new ObjectId(id), _deletedAt: null }, { $set: user })
         .exec();
 
-      return user;
+      return await this.findOneById(user._id.toHexString(), false);
     }
     throw new BadRequestException('Invalid role');
   }

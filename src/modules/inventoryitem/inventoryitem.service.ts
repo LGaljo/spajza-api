@@ -13,8 +13,8 @@ import { TracingService } from '../tracing/tracing.service';
 import { Trace, TraceDocument } from '../tracing/schema/tracing.schema';
 import { Context } from '../../context';
 import * as s3 from '../../lib/aws_s3';
-import * as Jimp from 'jimp';
 import * as sharp from 'sharp';
+import { remove } from '../../lib/aws_s3';
 
 @Injectable()
 export class InventoryItemsService {
@@ -132,21 +132,12 @@ export class InventoryItemsService {
       file.mimetype.split('/')[1]
     }`;
 
-    let buffer = await sharp(file.buffer).jpeg({ mozjpeg: true, quality: 100 }).toBuffer();
-    const image = await Jimp.read(buffer);
-    const w = image.getWidth();
-    const h = image.getHeight();
-    if (h !== w) {
-      image.crop(
-        w < h ? 0 : Math.abs(w - h) / 2 - 1,
-        w < h ? Math.abs(w - h) / 2 - 1 : 0,
-        Math.min(w, h),
-        Math.min(w, h),
-      );
-    }
-    image.resize(Math.min(Math.min(w, h), 800), Jimp.AUTO, Jimp.RESIZE_BEZIER).quality(90);
-    buffer = await image.getBufferAsync('image/jpeg');
-    const response = await s3.upload(key, 'image/jpeg', buffer);
+    const image = await sharp(file.buffer)
+      .resize({ fit: 'cover', width: 800, height: 800 })
+      .jpeg({ mozjpeg: true, quality: 90 })
+      .toBuffer();
+
+    const response = await s3.upload(key, 'image/jpeg', image);
     await this.inventoryItemModel
       .updateOne({ _id: new ObjectId(id) }, { $set: { cover: response, _updatedAt: new Date() } })
       .exec();
@@ -158,6 +149,10 @@ export class InventoryItemsService {
   // }
 
   async deleteItem(_id: string) {
+    const item = await this.findOne(_id);
+    if (item?.cover?.key) {
+      await remove(item?.cover?.key);
+    }
     await this.inventoryItemModel.updateOne({ _id }, { $set: { _deletedAt: new Date() } }).exec();
   }
 }

@@ -22,12 +22,12 @@ export class AuthService {
       email: user?.email,
       role: user?.role,
     };
+    const data = await this.usersService.findOneByUsernameOrEmail(user.username, false);
     return {
       access_token: this.jwtService.sign(payload, {
         expiresIn: saveme ? '7d' : '2d',
       }),
-      username: user?.username,
-      userId: user?._id?.toHexString(),
+      user: data,
     };
   }
 }

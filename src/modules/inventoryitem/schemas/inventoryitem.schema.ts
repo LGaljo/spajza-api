@@ -41,7 +41,7 @@ export class InventoryItem {
   @Prop({ default: ItemStatus.NEW })
   status: string;
 
-  @Prop({ type: Object })
+  @Prop({ type: Array })
   cover: any;
 
   @Prop({ type: Object })

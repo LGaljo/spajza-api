@@ -71,9 +71,15 @@ export class InventoryItemsController {
 
   @Post('file/:id')
   @UseInterceptors(FileInterceptor('file'))
-  public async updatePicture(@UploadedFile() file: Express.Multer.File, @Req() request: IRequest) {
+  public async addCoverImage(@UploadedFile() file: Express.Multer.File, @Req() request: IRequest) {
     const { params } = request;
-    return this.service.updateCoverImage(file, params.id);
+    return this.service.addCoverImage(file, params.id);
+  }
+
+  @Delete('file/:id')
+  public async removeCoverImage(@Req() request: IRequest) {
+    const { params, query } = request;
+    return this.service.removeCoverImage(query.key, params.id);
   }
 
   @Put(':id')

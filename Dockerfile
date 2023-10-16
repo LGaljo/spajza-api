@@ -22,8 +22,6 @@ WORKDIR /app
 
 COPY --from=builder --chown=node:node /app  .
 
-RUN npm install --build-from-source sharp
-
 USER node
 
 ARG NODE_ENV=production

@@ -69,7 +69,9 @@ export class InventoryItemsService {
     const { category, tags, statuses, search } = query;
     const filter = { _deletedAt: null };
     const sort: any = {};
-    category ? (filter['category'] = new ObjectId(category)) : null;
+    if (category) {
+      filter['category'] = { $in: category.map((t: any) => new ObjectId(t)) };
+    }
     if (tags) {
       filter['tags'] = { $in: tags.map((t: any) => new ObjectId(t)) };
     }
@@ -78,6 +80,7 @@ export class InventoryItemsService {
     }
     if (sort_field) {
       sort[sort_field] = sort_dir === 'asc' ? 1 : -1;
+      sort['_id'] = 1;
     }
     if (search) {
       filter['$text'] = { $search: search };
@@ -115,6 +118,7 @@ export class InventoryItemsService {
       object.tags = object.tags.map((t: any) => new ObjectId(t));
     }
 
+    // object.cover = objBefore.cover;
     object._updatedAt = new Date();
     delete object.categoryId;
     await this.tracingService.saveChange('inventoryitem', objBefore, object, context?.user._id);

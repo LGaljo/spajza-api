@@ -14,7 +14,6 @@ import { Trace, TraceDocument } from '../tracing/schema/tracing.schema';
 import { Context } from '../../context';
 import * as s3 from '../../lib/aws_s3';
 import * as sharp from 'sharp';
-import { remove } from '../../lib/aws_s3';
 
 @Injectable()
 export class InventoryItemsService {
@@ -70,7 +69,9 @@ export class InventoryItemsService {
     const { category, tags, statuses, search } = query;
     const filter = { _deletedAt: null };
     const sort: any = {};
-    category ? (filter['category'] = new ObjectId(category)) : null;
+    if (category) {
+      filter['category'] = { $in: category.map((t: any) => new ObjectId(t)) };
+    }
     if (tags) {
       filter['tags'] = { $in: tags.map((t: any) => new ObjectId(t)) };
     }
@@ -79,6 +80,7 @@ export class InventoryItemsService {
     }
     if (sort_field) {
       sort[sort_field] = sort_dir === 'asc' ? 1 : -1;
+      sort['_id'] = 1;
     }
     if (search) {
       filter['$text'] = { $search: search };
@@ -115,9 +117,8 @@ export class InventoryItemsService {
     if (object?.tags && object.tags.length && !(object.tags[0] instanceof Object)) {
       object.tags = object.tags.map((t: any) => new ObjectId(t));
     }
-    if (!object?.cover && objBefore?.cover?.Key) {
-      await s3.remove(objBefore?.cover?.Key);
-    }
+
+    // object.cover = objBefore.cover;
     object._updatedAt = new Date();
     delete object.categoryId;
     await this.tracingService.saveChange('inventoryitem', objBefore, object, context?.user._id);
@@ -127,10 +128,11 @@ export class InventoryItemsService {
     return this.findOne(object._id);
   }
 
-  async updateCoverImage(file: any, id: string): Promise<any> {
+  async addCoverImage(file: any, id: string): Promise<any> {
     const key = `item/${id}/original_${new ObjectId().toHexString()}.${
       file.mimetype.split('/')[1]
     }`;
+    const item = await this.inventoryItemModel.findOne({ _id: new ObjectId(id) }).exec();
 
     const image = await sharp(file.buffer)
       .resize({ fit: 'cover', width: 800, height: 800 })
@@ -138,9 +140,19 @@ export class InventoryItemsService {
       .toBuffer();
 
     const response = await s3.upload(key, 'image/jpeg', image);
-    await this.inventoryItemModel
-      .updateOne({ _id: new ObjectId(id) }, { $set: { cover: response, _updatedAt: new Date() } })
-      .exec();
+    const ims = [...item.cover, response];
+    item.cover = ims;
+    await item.save();
+    // await this.inventoryItemModel
+    //   .updateOne({ _id: new ObjectId(id) }, { $set: { cover: response, _updatedAt: new Date() } })
+    //   .exec();
+  }
+
+  async removeCoverImage(key: string, _id: string) {
+    const item = await this.inventoryItemModel.findOne({ _id: new ObjectId(_id) }).exec();
+    item.cover = item.cover.filter((im: any) => im.key !== key);
+    await item.save();
+    await s3.remove(key);
   }
 
   // async exists(_id: string): Promise<boolean> {
@@ -151,7 +163,7 @@ export class InventoryItemsService {
   async deleteItem(_id: string) {
     const item = await this.findOne(_id);
     if (item?.cover?.key) {
-      await remove(item?.cover?.key);
+      await s3.remove(item?.cover?.key);
     }
     await this.inventoryItemModel.updateOne({ _id }, { $set: { _deletedAt: new Date() } }).exec();
   }

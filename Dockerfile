@@ -1,7 +1,7 @@
 # Base image
 FROM node:18-alpine as builder
 
-RUN apk add vips-dev libheif
+RUN apk add vips-dev libheif alpine-sdk
 
 WORKDIR /app
 

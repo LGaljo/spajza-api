@@ -132,6 +132,8 @@ export class InventoryItemsService {
     const key = `item/${id}/original_${new ObjectId().toHexString()}.${
       file.mimetype.split('/')[1]
     }`;
+    console.log(file.mimetype);
+
     const item = await this.inventoryItemModel.findOne({ _id: new ObjectId(id) }).exec();
 
     const image = await sharp(file.buffer)
@@ -140,7 +142,11 @@ export class InventoryItemsService {
       .toBuffer();
 
     const response = await s3.upload(key, 'image/jpeg', image);
-    const ims = [...item.cover, response];
+    const ims = [];
+    if (item.cover && item.cover.length) {
+      ims.push(...item?.cover);
+    }
+    ims.push(response);
     item.cover = ims;
     await item.save();
     // await this.inventoryItemModel

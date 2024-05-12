@@ -51,7 +51,7 @@ export class CategoriesService {
   async deleteOne(id: string): Promise<any> {
     const countItems = await this.categoryModel
       .find({ category: new ObjectId(id), _deletedAt: null })
-      .count()
+      .countDocuments()
       .exec();
     if (countItems > 0) {
       throw new BadRequestException('There are still objects in this category');

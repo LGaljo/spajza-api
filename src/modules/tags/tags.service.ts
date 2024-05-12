@@ -33,7 +33,7 @@ export class TagsService {
   async deleteOne(id: string): Promise<any> {
     const countItems = await this.model
       .find({ category: new ObjectId(id), _deletedAt: null })
-      .count()
+      .countDocuments()
       .exec();
     if (countItems > 0) {
       throw new BadRequestException('There are still objects connected to the tag');

@@ -16,7 +16,7 @@ export class WishlistService {
     return item;
   }
 
-  async updateItem(context: Context, id: number, body: any) {
+  async updateItem(id: string, body: any) {
     return this.model.updateOne({ _id: new ObjectId(id) }, { $set: body }).exec();
   }
 
@@ -24,7 +24,7 @@ export class WishlistService {
     return this.model.find({ _deletedAt: null }).sort({ order: 1 }).exec();
   }
 
-  async removeItem(context: Context, _id: number) {
+  async removeItem(_id: string) {
     await this.model.updateOne({ _id }, { $set: { _deletedAt: new Date() } }).exec();
   }
 }

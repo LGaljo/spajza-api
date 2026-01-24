@@ -3,9 +3,9 @@ import { Category } from '../../categories/schemas/category.schema';
 import { Tag } from '../../tags/schemas/tag.schema';
 import { ObjectId } from 'mongodb';
 import { ItemStatus } from './itemstatus.enum';
-import { Types } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 
-export type InventoryItemDocument = InventoryItem & Document;
+export type InventoryItemDocument = HydratedDocument<InventoryItem>;
 
 // db.getCollection('inventoryitems').createIndex({nngrams: "text"})
 

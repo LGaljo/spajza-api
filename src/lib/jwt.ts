@@ -1,6 +1,7 @@
-import * as jwt from 'jsonwebtoken';
 import { env } from '../config/env';
 import { BadRequestException } from '@nestjs/common';
+import { verify, sign } from 'jsonwebtoken';
+import type { StringValue } from 'ms';
 
 export enum JwtTokenType {
   USER_AUTHENTICATION = 'USER_AUTHENTICATION',
@@ -18,21 +19,21 @@ export function parseToken(subject: JwtTokenType, token: string) {
     switch (subject) {
       case JwtTokenType.USER_AUTHENTICATION:
         data = {
-          ...(jwt.verify(token, env.JWT_SECRET, {
+          ...(verify(token, env.JWT_SECRET, {
             subject: JwtTokenType.USER_AUTHENTICATION,
           }) as any),
         };
         break;
       case JwtTokenType.CHANGE_PASSWORD:
         data = {
-          ...(jwt.verify(token, env.JWT_SECRET, {
+          ...(verify(token, env.JWT_SECRET, {
             subject: JwtTokenType.CHANGE_PASSWORD,
           }) as any),
         };
         break;
       case JwtTokenType.USER_CONFIRM_EMAIL:
         data = {
-          ...(jwt.verify(token, env.JWT_SECRET, {
+          ...(verify(token, env.JWT_SECRET, {
             subject: JwtTokenType.USER_CONFIRM_EMAIL,
           }) as any),
         };
@@ -48,7 +49,11 @@ export function parseToken(subject: JwtTokenType, token: string) {
   }
 }
 
-export function generateToken(subject: JwtTokenType, data: any, expiresIn: string): string {
+export function generateToken(
+  subject: JwtTokenType,
+  data: any,
+  expiresIn: StringValue | number,
+): string {
   switch (subject) {
     case JwtTokenType.USER_AUTHENTICATION:
       if (!data.userId) return null;
@@ -61,7 +66,7 @@ export function generateToken(subject: JwtTokenType, data: any, expiresIn: strin
       break;
   }
 
-  return jwt.sign({ ...data }, env.JWT_SECRET, {
+  return sign(data, env.JWT_SECRET, {
     subject,
     expiresIn,
   });

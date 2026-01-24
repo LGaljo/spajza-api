@@ -1,4 +1,4 @@
-import { BadRequestException, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { IRequest } from '../../middlewares/context.middleware';
 import { LocalAuthGuard } from '../../guards/local-auth.guard';
 import { AuthService } from './auth.service';
@@ -13,7 +13,10 @@ import { MailTemplates } from '../../lib/mail-templates';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService, private userService: UserService) {}
+  constructor(
+    private authService: AuthService,
+    private userService: UserService,
+  ) {}
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
@@ -39,8 +42,7 @@ export class AuthController {
   }
 
   @Post('resend-verification')
-  async resendVerification(@Req() req: IRequest) {
-    const { body } = req;
+  async resendVerification(@Body() body: any) {
     if (!body?.userId) {
       throw new BadRequestException('Missing id');
     }
@@ -48,8 +50,7 @@ export class AuthController {
   }
 
   @Post('verification')
-  async accountVerification(@Req() req: IRequest) {
-    const { body } = req;
+  async accountVerification(@Body() body: any) {
     const data = parseToken(JwtTokenType.USER_CONFIRM_EMAIL, body?.token);
     if (!data) {
       return { success: false };
@@ -76,8 +77,7 @@ export class AuthController {
   }
 
   @Post('request-password-change')
-  async requestPasswordChange(@Req() req: IRequest) {
-    const { body } = req;
+  async requestPasswordChange(@Body() body: any) {
     if (!body?.email) {
       throw new BadRequestException('Missing email parameter');
     }
@@ -102,8 +102,7 @@ export class AuthController {
   }
 
   @Post('ext-change-password')
-  async externalPasswordChange(@Req() req: IRequest) {
-    const { body } = req;
+  async externalPasswordChange(@Body() body: any) {
     const data = parseToken(JwtTokenType.CHANGE_PASSWORD, body?.token);
     if (!data) {
       return { success: false };

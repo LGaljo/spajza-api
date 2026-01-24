@@ -1,4 +1,4 @@
-import { Controller, Delete, Get, Post, Put, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Req, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 import { Roles } from '../../guards/roles.decorator';
 import { RolesGuard } from '../../guards/roles.guard';
@@ -22,8 +22,8 @@ export class WishlistController {
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN, Role.KEEPER, Role.USER)
-  public async createItem(@Req() request: IRequest): Promise<any> {
-    const { context, body } = request;
+  public async createItem(@Req() request: IRequest, @Body() body: any): Promise<any> {
+    const { context } = request;
     return this.service.createItem(context, body);
   }
 
@@ -31,17 +31,22 @@ export class WishlistController {
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN, Role.KEEPER, Role.USER)
-  public async updateItem(@Req() request: IRequest): Promise<any> {
-    const { context, body, params } = request;
-    return this.service.updateItem(context, Number(params.id), body);
+  public async updateItem(
+    @Req() request: IRequest,
+    @Body() body: any,
+    @Param('id', ParseIntPipe) id: string,
+  ): Promise<any> {
+    return this.service.updateItem(id, body);
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN, Role.KEEPER, Role.USER)
-  public async deleteItem(@Req() request: IRequest): Promise<any> {
-    const { context, params } = request;
-    return this.service.removeItem(context, Number(params.id));
+  public async deleteItem(
+    @Req() request: IRequest,
+    @Param('id', ParseIntPipe) id: string,
+  ): Promise<any> {
+    return this.service.removeItem(id);
   }
 }

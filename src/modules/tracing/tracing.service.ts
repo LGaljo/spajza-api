@@ -9,7 +9,7 @@ import { getObjectDiff } from '../../lib/utils';
 export class TracingService {
   constructor(@InjectModel(Trace.name) private modelTrace: Model<TraceDocument>) {}
 
-  async saveChange(type: string, beforeObj: any, nowObj: any, userId: number) {
+  async saveChange(type: string, beforeObj: any, nowObj: any, userId: string) {
     const changes = getObjectDiff(beforeObj, nowObj);
 
     const trace = new this.modelTrace({

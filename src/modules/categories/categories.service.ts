@@ -3,7 +3,10 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Category, CategoryDocument } from './schemas/category.schema';
 import { ObjectId } from 'mongodb';
-import { InventoryItem, InventoryItemDocument } from '../inventoryitem/schemas/inventoryitem.schema';
+import {
+  InventoryItem,
+  InventoryItemDocument,
+} from '../inventoryitem/schemas/inventoryitem.schema';
 import * as sharp from 'sharp';
 import * as s3 from '../../lib/aws_s3';
 

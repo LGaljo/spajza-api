@@ -1,8 +1,8 @@
-import * as aws from 'aws-sdk';
+import { S3 } from '@aws-sdk/client-s3';
 import { env } from '../config/env';
 
 export function createClient() {
-  return new aws.S3({
+  return new S3({
     region: env.AWS_REG,
     credentials: {
       accessKeyId: env.AWS_KEY,
@@ -17,7 +17,7 @@ export async function upload(
   file: Blob | Buffer | ReadableStream,
 ) {
   return new Promise((resolve, reject) => {
-    createClient().upload(
+    createClient().putObject(
       {
         Bucket: env.AWS_BUCKET,
         Key: key,

@@ -1,5 +1,5 @@
 import * as nodemailer from 'nodemailer';
-import { Options, MailOptions } from 'nodemailer/lib/smtp-transport';
+import { MailOptions, Options } from 'nodemailer/lib/smtp-transport';
 // import { Attachment } from 'nodemailer/lib/mailer';
 import { env } from '../config/env';
 import { InternalServerErrorException } from '@nestjs/common';

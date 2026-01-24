@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { HydratedDocument } from 'mongoose';
 
-export type RequestLogDocument = RequestLog & Document;
+export type RequestLogDocument = HydratedDocument<RequestLog>;
 
 @Schema()
 export class RequestLog {

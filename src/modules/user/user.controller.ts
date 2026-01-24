@@ -1,14 +1,15 @@
 import {
   BadRequestException,
+  Body,
   Controller,
   Delete,
   Get,
+  Param,
+  ParseIntPipe,
   Post,
   Put,
-  Req,
   UseGuards,
 } from '@nestjs/common';
-import { IRequest } from '../../middlewares/context.middleware';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 import { Roles } from '../../guards/roles.decorator';
@@ -27,22 +28,14 @@ export class UserController {
 
   @Get('/:id')
   @UseGuards(JwtAuthGuard)
-  public async getUser(@Req() request: IRequest): Promise<any> {
-    const { params } = request;
-    return this.userService.findOneById(params.id);
+  public async getUser(@Param('id', ParseIntPipe) id: string): Promise<any> {
+    return this.userService.findOneById(id);
   }
 
   @Post()
-  public async registerUser(@Req() request: IRequest): Promise<any> {
-    const { body } = request;
-
+  public async registerUser(@Body() body: any): Promise<any> {
     try {
-      if (
-        body.hasOwnProperty('username') &&
-        body.hasOwnProperty('email') &&
-        body.hasOwnProperty('password') &&
-        body.hasOwnProperty('username')
-      ) {
+      if (body.username && body.email && body.password) {
         delete body.role;
         return {
           user: await this.userService.create(body),
@@ -67,29 +60,26 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
-  public async updateUser(@Req() request: IRequest): Promise<any> {
-    const { body, params } = request;
-
-    return this.userService.update(params.id, body);
+  public async updateUser(@Param('id', ParseIntPipe) id: string, @Body() body: any): Promise<any> {
+    return this.userService.update(id, body);
   }
 
   @Put('/:id/role')
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
-  public async updateUserRole(@Req() request: IRequest): Promise<any> {
-    const { body, params } = request;
-
-    return this.userService.updateRole(params.id, body?.role);
+  public async updateUserRole(
+    @Param('id', ParseIntPipe) id: string,
+    @Body() body: any,
+  ): Promise<any> {
+    return this.userService.updateRole(id, body?.role);
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
-  public async deleteUser(@Req() request: IRequest): Promise<any> {
-    const { context, params } = request;
-
-    return this.userService.deleteUser(context, params.id);
+  public async deleteUser(@Param('id', ParseIntPipe) id: string): Promise<any> {
+    return this.userService.deleteUser(id);
   }
 }

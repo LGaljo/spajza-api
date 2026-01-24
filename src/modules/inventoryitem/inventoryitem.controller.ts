@@ -1,10 +1,14 @@
 import {
   BadRequestException,
+  Body,
   Controller,
   Delete,
   Get,
+  Param,
+  ParseIntPipe,
   Post,
   Put,
+  Query,
   Req,
   UploadedFile,
   UseGuards,
@@ -26,9 +30,7 @@ export class InventoryItemsController {
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN, Role.USER, Role.KEEPER)
-  public async getInventoryItems(@Req() request: IRequest): Promise<any> {
-    const { query } = request;
-
+  public async getInventoryItems(@Query() query: any): Promise<any> {
     const limit = Number(query?.limit) || 15;
     const skip = Number(query?.skip) || 0;
     const sort = query?.sort;
@@ -41,17 +43,15 @@ export class InventoryItemsController {
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN, Role.USER, Role.KEEPER)
-  public async getInventoryItem(@Req() request: IRequest): Promise<any> {
-    const { params } = request;
-    return this.service.findOne(params?.id);
+  public async getInventoryItem(@Param('id', ParseIntPipe) id: string): Promise<any> {
+    return this.service.findOne(id);
   }
 
   @Post()
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN, Role.KEEPER)
-  public async createInventoryItem(@Req() request: IRequest): Promise<any> {
-    const { body } = request;
+  public async createInventoryItem(@Body() body: any): Promise<any> {
     return this.service.create(body);
   }
 
@@ -59,8 +59,7 @@ export class InventoryItemsController {
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN, Role.KEEPER)
-  public async createMultipleInventoryItems(@Req() request: IRequest): Promise<any> {
-    const { body } = request;
+  public async createMultipleInventoryItems(@Body() body: any): Promise<any> {
     if (!body.length) {
       throw new BadRequestException('Empty body');
     }
@@ -71,24 +70,29 @@ export class InventoryItemsController {
 
   @Post('file/:id')
   @UseInterceptors(FileInterceptor('file'))
-  public async addCoverImage(@UploadedFile() file: Express.Multer.File, @Req() request: IRequest) {
-    const { params } = request;
-    return this.service.addCoverImage(file, params.id);
+  public async addCoverImage(
+    @UploadedFile() file: Express.Multer.File,
+    @Param('id', ParseIntPipe) id: string,
+  ) {
+    return this.service.addCoverImage(file, id);
   }
 
   @Delete('file/:id')
-  public async removeCoverImage(@Req() request: IRequest) {
-    const { params, query } = request;
-    return this.service.removeCoverImage(query.key, params.id);
+  public async removeCoverImage(@Param('id', ParseIntPipe) id: string, @Query() query: any) {
+    return this.service.removeCoverImage(query.key, id);
   }
 
   @Put(':id')
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN, Role.KEEPER)
-  public async updateItem(@Req() request: IRequest): Promise<any> {
-    const { body, params, context } = request;
-    return this.service.updateOne(context, body, params.id);
+  public async updateItem(
+    @Req() request: IRequest,
+    @Param('id', ParseIntPipe) id: string,
+    @Body() body: any,
+  ): Promise<any> {
+    const { context } = request;
+    return this.service.updateOne(context, body, id);
   }
 
   // TODO: Add different update method for modifying only specific fields
@@ -97,8 +101,7 @@ export class InventoryItemsController {
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN, Role.KEEPER)
-  public async deleteItem(@Req() request: IRequest): Promise<any> {
-    const { params } = request;
-    return this.service.deleteItem(params.id);
+  public async deleteItem(@Param('id', ParseIntPipe) id: string): Promise<any> {
+    return this.service.deleteItem(id);
   }
 }

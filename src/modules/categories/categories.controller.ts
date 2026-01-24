@@ -1,16 +1,16 @@
 import {
+  Body,
   Controller,
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Post,
   Query,
-  Req,
   UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { IRequest } from '../../middlewares/context.middleware';
 import { CategoriesService } from './categories.service';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 import { RolesGuard } from '../../guards/roles.guard';
@@ -27,8 +27,7 @@ export class CategoriesController {
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN, Role.USER, Role.KEEPER)
-  public async getAll(@Req() request: IRequest): Promise<any> {
-    const { query } = request;
+  public async getAll(@Query() query: any): Promise<any> {
     return await this.service.findAll(query);
   }
 
@@ -36,45 +35,49 @@ export class CategoriesController {
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN, Role.USER, Role.KEEPER)
-  public async getOne(@Req() request: IRequest): Promise<any> {
-    return await this.service.findOneById(new ObjectId(request.params.id));
+  public async getOne(@Param('id', ParseIntPipe) id: string): Promise<any> {
+    return await this.service.findOneById(new ObjectId(id));
   }
 
   @Post()
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
-  public async create(@Req() request: IRequest): Promise<any> {
-    return await this.service.create(request.body);
+  public async create(@Body() body: any): Promise<any> {
+    return await this.service.create(body);
   }
 
   @Post(':id')
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
-  public async updateOne(@Req() request: IRequest): Promise<any> {
-    return await this.service.updateOne(request.body, request.params.id);
+  public async updateOne(@Param('id', ParseIntPipe) id: string, @Body() body: any): Promise<any> {
+    return await this.service.updateOne(body, id);
   }
 
   @Post('file/:id')
   @UseInterceptors(FileInterceptor('file'))
-  public async updatePicture(@UploadedFile() file: Express.Multer.File, @Req() request: IRequest) {
-    const { params } = request;
-    return this.service.updateTemplateImage(file, params.id);
+  public async updatePicture(
+    @UploadedFile() file: Express.Multer.File,
+    @Param('id', ParseIntPipe) id: string,
+  ) {
+    return this.service.updateTemplateImage(file, id);
   }
 
   @Post('remove_file/:id')
   @UseInterceptors(FileInterceptor('file'))
-  public async removePicture(@UploadedFile() file: Express.Multer.File, @Req() request: IRequest) {
-    const { params } = request;
-    return this.service.removeTemplateImage(params.id);
+  public async removePicture(
+    @UploadedFile() file: Express.Multer.File,
+    @Param('id', ParseIntPipe) id: string,
+  ) {
+    return this.service.removeTemplateImage(id);
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
-  public async delete(@Req() request: IRequest): Promise<any> {
-    return await this.service.deleteOne(request.params.id);
+  public async delete(@Param('id', ParseIntPipe) id: string): Promise<any> {
+    return await this.service.deleteOne(id);
   }
 }

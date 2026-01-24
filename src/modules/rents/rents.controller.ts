@@ -1,4 +1,4 @@
-import { Controller, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Param, ParseIntPipe, Post, Req, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 import { Roles } from '../../guards/roles.decorator';
 import { RolesGuard } from '../../guards/roles.guard';
@@ -14,17 +14,24 @@ export class RentsController {
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN, Role.KEEPER, Role.USER)
-  public async createInventoryItem(@Req() request: IRequest): Promise<any> {
-    const { context, body, params } = request;
-    return this.service.rentItem(context, params.id, body);
+  public async createInventoryItem(
+    @Req() request: IRequest,
+    @Param('id', ParseIntPipe) id: string,
+    @Body() body: any,
+  ): Promise<any> {
+    const { context } = request;
+    return this.service.rentItem(context, id, body);
   }
 
   @Post('return/:id')
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN, Role.KEEPER, Role.USER)
-  public async returnInventoryItem(@Req() request: IRequest): Promise<any> {
-    const { context, params } = request;
-    return this.service.returnItem(context, params.id);
+  public async returnInventoryItem(
+    @Req() request: IRequest,
+    @Param('id', ParseIntPipe) id: string,
+  ): Promise<any> {
+    const { context } = request;
+    return this.service.returnItem(context, id);
   }
 }

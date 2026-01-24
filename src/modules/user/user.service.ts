@@ -10,7 +10,6 @@ import { Role } from './schemas/roles.enum';
 import { generateActivationUrl } from '../../lib/jwt';
 import { MailTemplates } from '../../lib/mail-templates';
 import { sendMail } from '../../lib/smtp';
-import { Context } from '../../context';
 
 @Injectable()
 export class UserService {
@@ -120,7 +119,7 @@ export class UserService {
     });
   }
 
-  async deleteUser(context: Context, _id: any) {
+  async deleteUser(_id: any) {
     await this.userModel.updateOne({ _id }, { $set: { _deletedAt: new Date() } }).exec();
   }
 }

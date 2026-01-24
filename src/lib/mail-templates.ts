@@ -24,7 +24,7 @@ export class MailTemplates {
   public static getTemplate(templateName: string) {
     const templateDir = env.MAIL_TEMPLATE_PATH || path.resolve(__dirname, '../templates');
     console.log(templateDir);
-    if (!this.templates.hasOwnProperty(templateName)) {
+    if (!Object.prototype.hasOwnProperty.call(this.templates, templateName)) {
       try {
         const html = fs.readFileSync(path.resolve(`${templateDir}/${templateName}.html`), 'utf8');
         this.templates[templateName] = handlebars.compile(html);

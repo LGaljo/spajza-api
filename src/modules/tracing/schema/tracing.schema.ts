@@ -1,7 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { HydratedDocument } from 'mongoose';
 import { ObjectId } from 'mongodb';
 
-export type TraceDocument = Trace & Document;
+export type TraceDocument = HydratedDocument<Trace>;
 
 @Schema()
 export class Trace {

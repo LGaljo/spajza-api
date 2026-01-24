@@ -144,7 +144,7 @@ export class InventoryItemsService {
     const response = await s3.upload(key, 'image/jpeg', image);
     const ims = [];
     if (item.cover && item.cover.length) {
-      ims.push(...item?.cover);
+      ims.push(...item.cover);
     }
     ims.push(response);
     item.cover = ims;

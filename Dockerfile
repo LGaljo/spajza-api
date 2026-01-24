@@ -1,7 +1,7 @@
 # Base image
-FROM node:20-alpine as builder
+FROM node:22.22.0-alpine AS builder
 
-RUN apk add vips-dev libheif alpine-sdk
+RUN apk add libheif alpine-sdk vips-dev
 
 WORKDIR /app
 
@@ -14,9 +14,9 @@ RUN npm run build
 RUN rm -rf node_modules && \
   NODE_ENV=production npm ci
 
-FROM node:20-alpine
+FROM node:22.22.0-alpine
 
-RUN apk add vips-dev libheif
+RUN apk add libheif vips-dev
 
 WORKDIR /app
 

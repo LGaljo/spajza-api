@@ -46,7 +46,7 @@ export class UserService {
       select['hash'] = 1;
       select['salt'] = 1;
     }
-    return await this.userModel.find({ _deletedAt: null }).select(select).exec();
+    return await this.userModel.find({ _deletedAt: null }).select(select).lean().exec();
   }
 
   async findOneByUsernameOrEmail(value: string, keepHash = false): Promise<UserDocument> {
@@ -63,6 +63,7 @@ export class UserService {
     return await this.userModel
       .findOne({ $or: [{ username: value }, { email: value }], _deletedAt: null })
       .select(select)
+      .lean()
       .exec();
   }
 
@@ -80,6 +81,7 @@ export class UserService {
     return await this.userModel
       .findOne({ _id: new ObjectId(id), _deletedAt: null })
       .select(select)
+      .lean()
       .exec();
   }
 

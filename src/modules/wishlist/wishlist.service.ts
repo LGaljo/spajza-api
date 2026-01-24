@@ -21,7 +21,7 @@ export class WishlistService {
   }
 
   async getItems() {
-    return this.model.find({ _deletedAt: null }).sort({ order: 1 }).exec();
+    return this.model.find({ _deletedAt: null }).sort({ order: 1 }).lean().exec();
   }
 
   async removeItem(_id: string) {

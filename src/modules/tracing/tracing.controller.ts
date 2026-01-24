@@ -13,7 +13,7 @@ export class TracingController {
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN, Role.USER, Role.KEEPER)
-  async getChangesForItem(@Param('id', ParseIntPipe) id: string): Promise<any> {
+  async getChangesForItem(@Param('id') id: string): Promise<any> {
     return await this.service.getChangesForObject(id);
   }
 }

@@ -31,7 +31,7 @@ export class TagsController {
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN, Role.USER, Role.KEEPER)
-  public async getOne(@Param('id', ParseIntPipe) id: string): Promise<any> {
+  public async getOne(@Param('id') id: string): Promise<any> {
     return await this.service.findOneById(new ObjectId(id));
   }
 
@@ -47,7 +47,7 @@ export class TagsController {
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
-  public async updateOne(@Param('id', ParseIntPipe) id: string, @Body() body: any): Promise<any> {
+  public async updateOne(@Param('id') id: string, @Body() body: any): Promise<any> {
     return await this.service.updateOne(body, new ObjectId(id));
   }
 
@@ -55,7 +55,7 @@ export class TagsController {
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
-  public async delete(@Param('id', ParseIntPipe) id: string): Promise<any> {
+  public async delete(@Param('id') id: string): Promise<any> {
     return await this.service.deleteOne(id);
   }
 }

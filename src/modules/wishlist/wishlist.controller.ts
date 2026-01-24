@@ -34,7 +34,7 @@ export class WishlistController {
   public async updateItem(
     @Req() request: IRequest,
     @Body() body: any,
-    @Param('id', ParseIntPipe) id: string,
+    @Param('id') id: string,
   ): Promise<any> {
     return this.service.updateItem(id, body);
   }
@@ -45,7 +45,7 @@ export class WishlistController {
   @Roles(Role.ADMIN, Role.KEEPER, Role.USER)
   public async deleteItem(
     @Req() request: IRequest,
-    @Param('id', ParseIntPipe) id: string,
+    @Param('id') id: string,
   ): Promise<any> {
     return this.service.removeItem(id);
   }

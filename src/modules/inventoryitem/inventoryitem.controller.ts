@@ -43,7 +43,7 @@ export class InventoryItemsController {
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN, Role.USER, Role.KEEPER)
-  public async getInventoryItem(@Param('id', ParseIntPipe) id: string): Promise<any> {
+  public async getInventoryItem(@Param('id') id: string): Promise<any> {
     return this.service.findOne(id);
   }
 
@@ -63,22 +63,20 @@ export class InventoryItemsController {
     if (!body.length) {
       throw new BadRequestException('Empty body');
     }
-    for (const item of body) {
-      await this.service.create(item);
-    }
+    return this.service.createMany(body);
   }
 
   @Post('file/:id')
   @UseInterceptors(FileInterceptor('file'))
   public async addCoverImage(
     @UploadedFile() file: Express.Multer.File,
-    @Param('id', ParseIntPipe) id: string,
+    @Param('id') id: string,
   ) {
     return this.service.addCoverImage(file, id);
   }
 
   @Delete('file/:id')
-  public async removeCoverImage(@Param('id', ParseIntPipe) id: string, @Query() query: any) {
+  public async removeCoverImage(@Param('id') id: string, @Query() query: any) {
     return this.service.removeCoverImage(query.key, id);
   }
 
@@ -88,7 +86,7 @@ export class InventoryItemsController {
   @Roles(Role.ADMIN, Role.KEEPER)
   public async updateItem(
     @Req() request: IRequest,
-    @Param('id', ParseIntPipe) id: string,
+    @Param('id') id: string,
     @Body() body: any,
   ): Promise<any> {
     const { context } = request;
@@ -101,7 +99,7 @@ export class InventoryItemsController {
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN, Role.KEEPER)
-  public async deleteItem(@Param('id', ParseIntPipe) id: string): Promise<any> {
+  public async deleteItem(@Param('id') id: string): Promise<any> {
     return this.service.deleteItem(id);
   }
 }

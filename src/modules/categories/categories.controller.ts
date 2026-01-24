@@ -35,7 +35,7 @@ export class CategoriesController {
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN, Role.USER, Role.KEEPER)
-  public async getOne(@Param('id', ParseIntPipe) id: string): Promise<any> {
+  public async getOne(@Param('id') id: string): Promise<any> {
     return await this.service.findOneById(new ObjectId(id));
   }
 
@@ -51,7 +51,7 @@ export class CategoriesController {
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
-  public async updateOne(@Param('id', ParseIntPipe) id: string, @Body() body: any): Promise<any> {
+  public async updateOne(@Param('id') id: string, @Body() body: any): Promise<any> {
     return await this.service.updateOne(body, id);
   }
 
@@ -59,7 +59,7 @@ export class CategoriesController {
   @UseInterceptors(FileInterceptor('file'))
   public async updatePicture(
     @UploadedFile() file: Express.Multer.File,
-    @Param('id', ParseIntPipe) id: string,
+    @Param('id') id: string,
   ) {
     return this.service.updateTemplateImage(file, id);
   }
@@ -68,7 +68,7 @@ export class CategoriesController {
   @UseInterceptors(FileInterceptor('file'))
   public async removePicture(
     @UploadedFile() file: Express.Multer.File,
-    @Param('id', ParseIntPipe) id: string,
+    @Param('id') id: string,
   ) {
     return this.service.removeTemplateImage(id);
   }
@@ -77,7 +77,7 @@ export class CategoriesController {
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
-  public async delete(@Param('id', ParseIntPipe) id: string): Promise<any> {
+  public async delete(@Param('id') id: string): Promise<any> {
     return await this.service.deleteOne(id);
   }
 }

@@ -15,15 +15,15 @@ export class TagsService {
   }
 
   async findAll(): Promise<TagDocument[]> {
-    return this.model.find({ _deletedAt: null }).sort({ name: 1 }).exec();
+    return this.model.find({ _deletedAt: null }).sort({ name: 1 }).lean().exec();
   }
 
   async findOneById(id: ObjectId): Promise<TagDocument> {
-    return this.model.findOne({ _id: new ObjectId(id), _deletedAt: null }).exec();
+    return this.model.findOne({ _id: new ObjectId(id), _deletedAt: null }).lean().exec();
   }
 
   async findOneByName(name: string): Promise<TagDocument> {
-    return this.model.findOne({ name, _deletedAt: null }).exec();
+    return this.model.findOne({ name, _deletedAt: null }).lean().exec();
   }
 
   async updateOne(body: any, id: ObjectId): Promise<any> {

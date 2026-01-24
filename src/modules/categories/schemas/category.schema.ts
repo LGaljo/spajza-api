@@ -16,3 +16,4 @@ export class Category {
 }
 
 export const CategoriesSchema = SchemaFactory.createForClass(Category);
+CategoriesSchema.index({ name: 1, _deletedAt: 1 });

@@ -67,3 +67,8 @@ export class InventoryItem {
 }
 
 export const InventoryItemsSchema = SchemaFactory.createForClass(InventoryItem);
+InventoryItemsSchema.index({ _deletedAt: 1 });
+InventoryItemsSchema.index({ category: 1, _deletedAt: 1 });
+InventoryItemsSchema.index({ tags: 1, _deletedAt: 1 });
+InventoryItemsSchema.index({ status: 1, _deletedAt: 1 });
+InventoryItemsSchema.index({ nngrams: 'text' });

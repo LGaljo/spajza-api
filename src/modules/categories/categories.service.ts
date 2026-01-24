@@ -28,12 +28,13 @@ export class CategoriesService {
     if (options?.url) {
       filter['url'] = { $ne: null };
     }
-    return this.categoryModel.find(filter).sort({ name: 1 }).exec();
+    return this.categoryModel.find(filter).sort({ name: 1 }).lean().exec();
   }
 
   async findOneById(id: ObjectId): Promise<CategoryDocument & Category & { _id: Types.ObjectId }> {
     const obj = await this.categoryModel
       .findOne({ _id: new ObjectId(id), _deletedAt: null })
+      .lean()
       .exec();
     if (!obj?._id) {
       throw new BadRequestException('Specified category does not exist');
@@ -42,7 +43,7 @@ export class CategoriesService {
   }
 
   async findOneByName(name: string): Promise<CategoryDocument> {
-    return this.categoryModel.findOne({ name, _deletedAt: null }).exec();
+    return this.categoryModel.findOne({ name, _deletedAt: null }).lean().exec();
   }
 
   async updateOne(body: any, id: string): Promise<any> {

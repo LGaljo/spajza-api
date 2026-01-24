@@ -13,3 +13,4 @@ export class Tag {
 }
 
 export const TagsSchema = SchemaFactory.createForClass(Tag);
+TagsSchema.index({ name: 1, _deletedAt: 1 });

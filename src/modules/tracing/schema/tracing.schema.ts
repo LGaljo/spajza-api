@@ -23,3 +23,4 @@ export class Trace {
 }
 
 export const TracesSchema = SchemaFactory.createForClass(Trace);
+TracesSchema.index({ originalObjectId: 1 });

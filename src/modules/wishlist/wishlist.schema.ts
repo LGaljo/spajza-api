@@ -32,3 +32,5 @@ export class Wishlist {
 }
 
 export const WishlistSchema = SchemaFactory.createForClass(Wishlist);
+WishlistSchema.index({ user: 1, _deletedAt: 1 });
+WishlistSchema.index({ order: 1, _deletedAt: 1 });

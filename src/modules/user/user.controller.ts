@@ -28,7 +28,7 @@ export class UserController {
 
   @Get('/:id')
   @UseGuards(JwtAuthGuard)
-  public async getUser(@Param('id', ParseIntPipe) id: string): Promise<any> {
+  public async getUser(@Param('id') id: string): Promise<any> {
     return this.userService.findOneById(id);
   }
 
@@ -60,7 +60,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
-  public async updateUser(@Param('id', ParseIntPipe) id: string, @Body() body: any): Promise<any> {
+  public async updateUser(@Param('id') id: string, @Body() body: any): Promise<any> {
     return this.userService.update(id, body);
   }
 
@@ -69,7 +69,7 @@ export class UserController {
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
   public async updateUserRole(
-    @Param('id', ParseIntPipe) id: string,
+    @Param('id') id: string,
     @Body() body: any,
   ): Promise<any> {
     return this.userService.updateRole(id, body?.role);
@@ -79,7 +79,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
-  public async deleteUser(@Param('id', ParseIntPipe) id: string): Promise<any> {
+  public async deleteUser(@Param('id') id: string): Promise<any> {
     return this.userService.deleteUser(id);
   }
 }

@@ -16,7 +16,7 @@ export class RentsController {
   @Roles(Role.ADMIN, Role.KEEPER, Role.USER)
   public async createInventoryItem(
     @Req() request: IRequest,
-    @Param('id', ParseIntPipe) id: string,
+    @Param('id') id: string,
     @Body() body: any,
   ): Promise<any> {
     const { context } = request;
@@ -29,7 +29,7 @@ export class RentsController {
   @Roles(Role.ADMIN, Role.KEEPER, Role.USER)
   public async returnInventoryItem(
     @Req() request: IRequest,
-    @Param('id', ParseIntPipe) id: string,
+    @Param('id') id: string,
   ): Promise<any> {
     const { context } = request;
     return this.service.returnItem(context, id);

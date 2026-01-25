@@ -25,7 +25,20 @@ export async function upload(
       Body: file,
       ContentType: contentType,
     });
-    return data;
+    const location =
+      env.AWS_BUCKET && env.AWS_REG
+        ? `https://${env.AWS_BUCKET}.s3.${env.AWS_REG}.amazonaws.com/${key}`
+        : undefined;
+    return {
+      Bucket: env.AWS_BUCKET,
+      Key: key,
+      Location: location,
+      ETag: data?.ETag,
+      bucket: env.AWS_BUCKET,
+      key,
+      location,
+      etag: data?.ETag,
+    };
   } catch (err) {
     console.error(err);
     throw err;

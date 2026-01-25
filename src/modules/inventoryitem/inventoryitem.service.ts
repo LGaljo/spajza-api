@@ -209,7 +209,7 @@ export class InventoryItemsService {
     const key = `item/${id}/original_${new ObjectId().toHexString()}.${
       file.mimetype.split('/')[1]
     }`;
-    console.log(file.mimetype);
+    // console.log(file.mimetype);
 
     const image = await sharp(file.buffer)
       .resize({ fit: 'cover', width: 800, height: 800 })
@@ -217,7 +217,6 @@ export class InventoryItemsService {
       .toBuffer();
 
     const response = await s3.upload(key, 'image/jpeg', image);
-    delete response?.$metadata;
 
     await this.inventoryItemModel
       .updateOne(

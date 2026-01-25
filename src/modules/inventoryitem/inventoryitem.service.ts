@@ -217,6 +217,8 @@ export class InventoryItemsService {
       .toBuffer();
 
     const response = await s3.upload(key, 'image/jpeg', image);
+    delete response?.$metadata;
+
     await this.inventoryItemModel
       .updateOne(
         { _id: new ObjectId(id) },

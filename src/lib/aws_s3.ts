@@ -2,11 +2,11 @@ import { S3 } from '@aws-sdk/client-s3';
 import { env } from '../config/env';
 
 const client = new S3({
-    region: env.AWS_REG,
-    credentials: {
-      accessKeyId: env.AWS_KEY,
-      secretAccessKey: env.AWS_SECRET,
-    },
+  region: env.AWS_REG,
+  credentials: {
+    accessKeyId: env.AWS_KEY,
+    secretAccessKey: env.AWS_SECRET,
+  },
 });
 
 export function createClient() {
@@ -25,7 +25,6 @@ export async function upload(
       Body: file,
       ContentType: contentType,
     });
-    console.log(data);
     return data;
   } catch (err) {
     console.error(err);
@@ -39,7 +38,6 @@ export async function remove(key: string) {
       Bucket: env.AWS_BUCKET,
       Key: key,
     });
-    console.log(data);
     return data;
   } catch (err) {
     console.error(err);

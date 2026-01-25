@@ -5,7 +5,6 @@ import {
   Delete,
   Get,
   Param,
-  ParseIntPipe,
   Post,
   Put,
   Query,
@@ -67,15 +66,18 @@ export class InventoryItemsController {
   }
 
   @Post('file/:id')
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('file'))
-  public async addCoverImage(
-    @UploadedFile() file: Express.Multer.File,
-    @Param('id') id: string,
-  ) {
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN, Role.KEEPER)
+  public async addCoverImage(@UploadedFile() file: Express.Multer.File, @Param('id') id: string) {
     return this.service.addCoverImage(file, id);
   }
 
   @Delete('file/:id')
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN, Role.KEEPER)
   public async removeCoverImage(@Param('id') id: string, @Query() query: any) {
     return this.service.removeCoverImage(query.key, id);
   }

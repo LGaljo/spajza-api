@@ -5,7 +5,6 @@ import {
   Delete,
   Get,
   Param,
-  ParseIntPipe,
   Post,
   Put,
   UseGuards,
@@ -22,12 +21,16 @@ export class UserController {
 
   @Get()
   @UseGuards(JwtAuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN, Role.KEEPER, Role.USER)
   public async getUsers(): Promise<any> {
     return this.userService.findAll();
   }
 
   @Get('/:id')
   @UseGuards(JwtAuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN, Role.KEEPER, Role.USER)
   public async getUser(@Param('id') id: string): Promise<any> {
     return this.userService.findOneById(id);
   }
@@ -68,10 +71,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
-  public async updateUserRole(
-    @Param('id') id: string,
-    @Body() body: any,
-  ): Promise<any> {
+  public async updateUserRole(@Param('id') id: string, @Body() body: any): Promise<any> {
     return this.userService.updateRole(id, body?.role);
   }
 

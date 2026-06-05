@@ -1,4 +1,14 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 import { Roles } from '../../guards/roles.decorator';
 import { RolesGuard } from '../../guards/roles.guard';
@@ -36,17 +46,16 @@ export class WishlistController {
     @Body() body: any,
     @Param('id') id: string,
   ): Promise<any> {
-    return this.service.updateItem(id, body);
+    const { context } = request;
+    return this.service.updateItem(context, id, body);
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN, Role.KEEPER, Role.USER)
-  public async deleteItem(
-    @Req() request: IRequest,
-    @Param('id') id: string,
-  ): Promise<any> {
-    return this.service.removeItem(id);
+  public async deleteItem(@Req() request: IRequest, @Param('id') id: string): Promise<any> {
+    const { context } = request;
+    return this.service.removeItem(context, id);
   }
 }

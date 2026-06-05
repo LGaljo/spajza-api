@@ -85,5 +85,5 @@ export function generateChangePasswordUrl(userId: string, email: string) {
   if (!token) {
     throw new BadRequestException('Token was not generated');
   }
-  return `${env.APP_URL}/change/password?token=${token}&userId=${userId}`;
+  return `${env.APP_URL}/password/change?token=${token}&userId=${userId}`;
 }

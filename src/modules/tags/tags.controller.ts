@@ -1,13 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  ParseIntPipe,
-  Post,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { TagsService } from './tags.service';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 import { Roles } from '../../guards/roles.decorator';
@@ -38,7 +29,7 @@ export class TagsController {
   @Post()
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
-  @Roles(Role.ADMIN)
+  @Roles(Role.ADMIN, Role.KEEPER)
   public async create(@Body() body: any): Promise<any> {
     return await this.service.create(body);
   }
@@ -46,7 +37,7 @@ export class TagsController {
   @Post(':id')
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
-  @Roles(Role.ADMIN)
+  @Roles(Role.ADMIN, Role.KEEPER)
   public async updateOne(@Param('id') id: string, @Body() body: any): Promise<any> {
     return await this.service.updateOne(body, new ObjectId(id));
   }
@@ -54,7 +45,7 @@ export class TagsController {
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
-  @Roles(Role.ADMIN)
+  @Roles(Role.ADMIN, Role.KEEPER)
   public async delete(@Param('id') id: string): Promise<any> {
     return await this.service.deleteOne(id);
   }

@@ -42,7 +42,7 @@ export class CategoriesController {
   @Post()
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
-  @Roles(Role.ADMIN)
+  @Roles(Role.ADMIN, Role.KEEPER)
   public async create(@Body() body: any): Promise<any> {
     return await this.service.create(body);
   }
@@ -50,33 +50,33 @@ export class CategoriesController {
   @Post(':id')
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
-  @Roles(Role.ADMIN)
+  @Roles(Role.ADMIN, Role.KEEPER)
   public async updateOne(@Param('id') id: string, @Body() body: any): Promise<any> {
     return await this.service.updateOne(body, id);
   }
 
   @Post('file/:id')
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN, Role.KEEPER)
   @UseInterceptors(FileInterceptor('file'))
-  public async updatePicture(
-    @UploadedFile() file: Express.Multer.File,
-    @Param('id') id: string,
-  ) {
+  public async updatePicture(@UploadedFile() file: Express.Multer.File, @Param('id') id: string) {
     return this.service.updateTemplateImage(file, id);
   }
 
   @Post('remove_file/:id')
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN, Role.KEEPER)
   @UseInterceptors(FileInterceptor('file'))
-  public async removePicture(
-    @UploadedFile() file: Express.Multer.File,
-    @Param('id') id: string,
-  ) {
+  public async removePicture(@UploadedFile() file: Express.Multer.File, @Param('id') id: string) {
     return this.service.removeTemplateImage(id);
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
-  @Roles(Role.ADMIN)
+  @Roles(Role.ADMIN, Role.KEEPER)
   public async delete(@Param('id') id: string): Promise<any> {
     return await this.service.deleteOne(id);
   }

@@ -19,7 +19,10 @@ export class TagsService {
   }
 
   async findOneById(id: ObjectId): Promise<TagDocument> {
-    return this.model.findOne({ _id: new ObjectId(id), _deletedAt: null }).lean().exec();
+    return this.model
+      .findOne({ _id: new ObjectId(id), _deletedAt: null })
+      .lean()
+      .exec();
   }
 
   async findOneByName(name: string): Promise<TagDocument> {

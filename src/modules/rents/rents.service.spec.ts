@@ -1,19 +1,25 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { RentsService } from './rents.service';
 import { InventoryItemsService } from '../inventoryitem/inventoryitem.service';
+import { TracingService } from '../tracing/tracing.service';
 import { ObjectId } from 'mongodb';
 import { Context } from '../../context';
 import { ItemStatus } from '../inventoryitem/schemas/itemstatus.enum';
 import { Role } from '../user/schemas/roles.enum';
 import { ForbiddenException } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
 
 describe('RentsService', () => {
   let service: RentsService;
   let itemsService: jest.Mocked<InventoryItemsService>;
+  let tracingService: jest.Mocked<TracingService>;
 
   const mockInventoryItemsService = {
     findOne: jest.fn(),
     updateOne: jest.fn(),
+  };
+
+  const mockTracingService = {
+    saveChange: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -24,11 +30,16 @@ describe('RentsService', () => {
           provide: InventoryItemsService,
           useValue: mockInventoryItemsService,
         },
+        {
+          provide: TracingService,
+          useValue: mockTracingService,
+        },
       ],
     }).compile();
 
     service = module.get<RentsService>(RentsService);
     itemsService = module.get(InventoryItemsService);
+    tracingService = module.get(TracingService);
 
     jest.clearAllMocks();
   });
@@ -102,7 +113,7 @@ describe('RentsService', () => {
         rents: null,
       });
 
-      const result = await service.returnItem(mockContext, itemId);
+      const result = await service.returnItem(mockContext, itemId, {});
 
       expect(result.status).toEqual(ItemStatus.STORED);
       expect(result.rents).toBeNull();
@@ -133,7 +144,7 @@ describe('RentsService', () => {
         rents: null,
       });
 
-      const result = await service.returnItem(mockContext, itemId);
+      const result = await service.returnItem(mockContext, itemId, {});
       expect(result.status).toEqual(ItemStatus.STORED);
     });
 
@@ -161,7 +172,7 @@ describe('RentsService', () => {
         rents: null,
       });
 
-      const result = await service.returnItem(mockContext, itemId);
+      const result = await service.returnItem(mockContext, itemId, {});
       expect(result.status).toEqual(ItemStatus.STORED);
     });
 
@@ -184,7 +195,7 @@ describe('RentsService', () => {
 
       mockInventoryItemsService.findOne.mockResolvedValueOnce(mockItem);
 
-      await expect(service.returnItem(mockContext, itemId)).rejects.toThrow(ForbiddenException);
+      await expect(service.returnItem(mockContext, itemId, {})).rejects.toThrow(ForbiddenException);
     });
   });
 });

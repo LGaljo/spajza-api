@@ -3,4 +3,5 @@ export enum ItemStatus {
   BORROWED = 'BORROWED',
   STORED = 'STORED',
   WRITTEN_OFF = 'WRITTEN_OFF',
+  NEEDS_REPAIR = 'NEEDS_REPAIR',
 }

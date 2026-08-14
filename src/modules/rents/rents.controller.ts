@@ -30,8 +30,9 @@ export class RentsController {
   public async returnInventoryItem(
     @Req() request: IRequest,
     @Param('id') id: string,
+    @Body() body: any,
   ): Promise<any> {
     const { context } = request;
-    return this.service.returnItem(context, id);
+    return this.service.returnItem(context, id, body);
   }
 }

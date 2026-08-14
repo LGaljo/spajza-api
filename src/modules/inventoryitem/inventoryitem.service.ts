@@ -135,7 +135,7 @@ export class InventoryItemsService {
     sort_dir = 'asc',
     query: any = {},
   ): Promise<any> {
-    const { category, tags, statuses, search } = query;
+    const { category, tags, statuses, search, renter } = query;
     const filter = { _deletedAt: null };
     const sort: any = {};
     const asArray = (value: any) => {
@@ -152,6 +152,9 @@ export class InventoryItemsService {
     }
     if (statuses) {
       filter['status'] = { $in: asArray(statuses).map((s: any) => s) };
+    }
+    if (renter) {
+      filter['rents.renter'] = new ObjectId(renter);
     }
     if (sort_field) {
       sort[sort_field] = sort_dir === 'asc' ? 1 : -1;
@@ -250,5 +253,18 @@ export class InventoryItemsService {
       await s3.remove(item?.cover?.key);
     }
     await this.inventoryItemModel.updateOne({ _id }, { $set: { _deletedAt: new Date() } }).exec();
+  }
+
+  async findOverdueItems(): Promise<any[]> {
+    return this.inventoryItemModel
+      .find({
+        _deletedAt: null,
+        status: 'BORROWED',
+        'rents.returnTime': { $lt: new Date() },
+      })
+      .populate('category')
+      .populate('tags')
+      .populate({ path: 'rents.renter', model: 'User' })
+      .exec();
   }
 }

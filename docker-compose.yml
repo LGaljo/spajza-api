@@ -1,0 +1,34 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: spajza-api
+    ports:
+      - "4500:4500"
+    env_file:
+      - .env
+    environment:
+      - MONGO_URI=mongodb://db:27017/spajza
+      - PORT=4500
+      - HOST=0.0.0.0
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: mongo:7.0
+    container_name: spajza-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+volumes:
+  mongo-data:

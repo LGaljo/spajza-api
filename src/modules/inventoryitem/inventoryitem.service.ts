@@ -205,7 +205,7 @@ export class InventoryItemsService {
 
     await this.inventoryItemModel.updateOne({ _id: new ObjectId(id) }, { $set: object }).exec();
 
-    return this.findOne(object._id);
+    return this.findOne(id);
   }
 
   async addCoverImage(file: any, id: string): Promise<any> {

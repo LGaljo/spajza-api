@@ -18,12 +18,18 @@ import { UserModule } from './modules/user/user.module';
 import { WishlistModule } from './modules/wishlist/wishlist.module';
 import { ReservationsModule } from './modules/reservations/reservations.module';
 import { env } from './config/env';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
     ScheduleModule.forRoot(),
     MongooseModule.forRoot(env.MONGO_URI),
     MongooseModule.forFeature([{ name: RequestLog.name, schema: RequestLogSchema }]),
+    ThrottlerModule.forRoot([{
+      ttl: 60000,
+      limit: 100,
+    }]),
     UserModule,
     AuthModule,
     InventoryitemModule,
@@ -40,7 +46,13 @@ import { env } from './config/env';
     ReservationsModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

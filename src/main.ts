@@ -4,15 +4,17 @@ import helmet from 'helmet';
 import { env } from './config/env';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
-    cors: {
-      origin: '*',
-      methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-      preflightContinue: false,
-      optionsSuccessStatus: 204,
-    },
+  const corsOrigin = env.APP_URL || '*';
+
+  const app = await NestFactory.create(AppModule);
+
+  app.enableCors({
+    origin: corsOrigin,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
   });
-  app.enableCors();
+
   app.use(helmet());
 
   await app.listen(env.PORT, env.HOST);
